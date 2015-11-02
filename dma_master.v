@@ -71,7 +71,7 @@ assign nmi                     = 1'b0;
 //assign dma_addr                = 15'h0000;
 //assign dma_din                 = 16'h0000;
 //assign dma_en                  = 1'b0;
-assign dma_priority            = 1'b0;
+//assign dma_priority            = 1'b0;
 //assign dma_we                  = 2'b00;
 assign dma_wkup                = 1'b0;
 //wire     dma_en
