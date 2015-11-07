@@ -42,7 +42,17 @@ vlog -work work template_periph_8b.v
 vlog -work work timescale.v
 
 vsim -novopt tb_openMSP430
-add wave sim:/tb_openMSP430/dma_master_0/dma_priority_u/*
+#add wave sim:/tb_openMSP430/dma_master_0/dma_priority_u/*
+#add wave  \
+#sim:/tb_openMSP430/dma_master_0/dma_addr \
+#sim:/tb_openMSP430/dma_master_0/dma_din \
+#sim:/tb_openMSP430/dma_master_0/dma_en \
+#sim:/tb_openMSP430/dma_master_0/dma_we \
+#sim:/tb_openMSP430/dma_master_0/mclk \
+#sim:/tb_openMSP430/dma_master_0/dma_dout \
+#sim:/tb_openMSP430/dma_master_0/dma_ready \
+#sim:/tb_openMSP430/dma_master_0/dma_resp
+add wave sim:/tb_openMSP430/template_periph_8b_0/*
 radix -hex
 view wave
 run -all
