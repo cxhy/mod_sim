@@ -27,7 +27,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: dma_master.v
+// *File Name: dma_channel.v
 //
 // *Module Description:
 //                       dmaÖ÷»ú
