@@ -68,18 +68,6 @@ input              per_en;          // Peripheral enable (high active)
 input        [1:0] per_we;          // Peripheral write enable (high active)
 input              puc_rst;         // Main system reset
 
-//begin
-parameter         [14:0] BASE_ADDR  = 15'h0090;
-parameter                CNTRL      = 1'b0;
-
-wire                     reg_sel    = per_en & (per_addr[13:0]==BASE_ADDR[14:1]);
-
-
-
-//end
-
-
-
 
 //=============================================================================
 // 1)  PARAMETER DECLARATION
