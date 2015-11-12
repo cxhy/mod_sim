@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2009 , Olivier Girard
+// Copyright (C) 2009 , Guo Dezheng
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -30,16 +30,17 @@
 // *File Name: dma_channel.v
 //
 // *Module Description:
-//                       dma主机
+//                       
 //
 // *Author(s):
 //              - guodezheng,    cxhy1981@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 134 $
+// $Rev:  $
 // $LastChangedBy: guodezheng $
-// $LastChangedDate: 2015/10/6 星期二 12:02:45 $
+// $LastChangedDate:  22:09:32 11/12/15 $
 //----------------------------------------------------------------------------
+
 
 
 module dma_channel(
