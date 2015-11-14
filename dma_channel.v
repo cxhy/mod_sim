@@ -30,7 +30,7 @@
 // *File Name: dma_channel.v
 //
 // *Module Description:
-//                       
+//
 //
 // *Author(s):
 //              - guodezheng,    cxhy1981@gmail.com
@@ -126,11 +126,11 @@ assign DMASRCINCRx = dmax_ctl[9:8]   ;
 assign DMADSTBYTE  = dmax_ctl[7]     ;
 assign DMASRCBYTE  = dmax_ctl[6]     ;
 assign DMALEVEL    = dmax_ctl[5]     ;
-assign DMAEN       = dmax_ctl[4]     ;
+//assign DMAEN       = dmax_ctl[4]     ;
 assign DMAIFG      = dmax_ctl[3]     ;
 assign DMAIE       = dmax_ctl[2]     ;
 assign DMAABORT    = dmax_ctl[1]     ;
-assign DMAREQ      = dmax_ctl[0]     ;
+//assign DMAREQ      = dmax_ctl[0]     ;
 assign dma_wkup    = 1'b0            ;
 
 //FSM
@@ -151,16 +151,10 @@ reg             [15:0] T_SourceAdd   ;
 reg             [15:0] T_DestAdd     ;
 reg                    trigger_r     ;
 reg                    trigger_pos   ;
+reg                    read_done     ;
 
 
-always@(posedge mclk or posedge puc_rst)begin
-    if(puc_rst == 1'b1)begin
-    
-    end
-    else begin
-    
-    end
-end
+
 
 always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
@@ -171,45 +165,66 @@ always@(posedge mclk or posedge puc_rst)begin
     end
 end
 
+assign trigger_r   <= trigger                  ;
+assign trigger_pos <= trigger && (!trigger_r)  ;
 always@(*)begin
     if(puc_rst == 1'b1)begin
         next_state <= RESET;
     end
     else begin
-     case (current_state)
-         RESET         :    next_state = (DMAEN == 1'b1) ? INI : RESET;
-         INI           :    next_state = (DMAEN == 1'b1) ? IDLE : RESET;
-         IDLE          :    next_state = (DMAEN == 1'b1) ? WAIT_TRI : RESET;
-         WAIT_TRI      :    
-         HOLD          :    
-         RELOAD        :    
-         TF_DONE       :    
-         AUTO_RESET    :                 
-     endcase
+        case (current_state)
+            RESET         :    next_state = (DMAEN == 1'b1) ? INI : RESET;
+            INI           :    next_state = IDLE;
+            IDLE          :    next_state = (DMAEN == 1'b1) ? WAIT_TRI : RESET;
+            WAIT_TRI      :    begin
+                if(((trigger_pos == 1'b1)&&(DMALEVEL == 1'b0))||((trigger == 1'b1)&&(DMALEVEL == 1'b1)))begin
+                    next_state = READ;
+                end
+                else begin
+                    next_state = WAIT_TRI;
+                end
+            end
+            READ          :    next_state = (read_done == 1'b1) ? WRITE : READ;
+            WRITE         :
+            MODIFY        :
+            RELOAD        :
+            RELOAD_REQ    :
+            default       :
+        endcase
     end
 end
 
+
+
 always@(current_state or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
-
+        DMAEN     => 1'b0;
+        DMAREQ    => 1'b0;
     end
     else begin
+        DMAEN       <= dmax_ctl[4]     ;         //把DMAEN和DMAREQ信号放到状态机内部以便以后修改
+        DMAREQ      <= dmax_ctl[0]     ;
         case(current_state)
-            RESET         :
+            RESET         :    begin
+                DMAEN  <= 0;
+                DMAREQ <= 0;
+            end
             INI           :    begin
                 T_size      <= dmax_sz;
                 T_SourceAdd <= dmax_sa;
                 T_DestAdd   <= dmax_da;
             end
-            IDLE          :    
+            IDLE          :
             WAIT_TRI      :    begin
-                trigger_r = trigger;
-                trigger_pos = trigger && (!trigger_r);
             end
-            HOLD          :
+            READ          :    begin
+                
+            end
+            WRITE         :
+            MODIFY        :
             RELOAD        :
-            TF_DONE       :
-            AUTO_RESET    :        
+            RELOAD_REQ    :
+            default       :
         endcase
 
     end
