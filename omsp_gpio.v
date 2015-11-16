@@ -287,6 +287,13 @@ omsp_sync_cell sync_cell_p1in_5 (.data_out(p1in[5]), .data_in(p1_din[5] & P1_EN[
 omsp_sync_cell sync_cell_p1in_6 (.data_out(p1in[6]), .data_in(p1_din[6] & P1_EN[0]), .clk(mclk), .rst(puc_rst));
 omsp_sync_cell sync_cell_p1in_7 (.data_out(p1in[7]), .data_in(p1_din[7] & P1_EN[0]), .clk(mclk), .rst(puc_rst));
 
+//omsp_sync_cell sync_cell_p1in_0(
+//            .data_out    (p1in[0]),
+//            .data_in     (p1in[0] & P1_EN[0]),
+//            .clk         (mclk),
+//            .rst         (puc_rst)
+//);
+
 
 // P1OUT Register
 //----------------
