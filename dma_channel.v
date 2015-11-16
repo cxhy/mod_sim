@@ -152,6 +152,18 @@ reg             [15:0] T_DestAdd     ;
 reg                    trigger_r     ;
 reg                    trigger_pos   ;
 reg                    read_done     ;
+reg             [15:0] data_reg      ; //把输入的数据寄存在这里
+
+wire                   dma_ready_r   ;
+//把dma_ready信号延时一拍，dma_ready后面的一拍信号就是dma总线上的输入数据
+always@(posedge clk or posedge puc_rst)begin
+    if(puc_rst == 1'b0)begin
+        dma_ready_r <= 1'b0;
+    end
+    else begin
+        dma_ready_r <= dma_ready;
+    end
+end
 
 
 
@@ -198,8 +210,9 @@ end
 
 always@(current_state or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
-        DMAEN     => 1'b0;
-        DMAREQ    => 1'b0;
+        DMAEN     <= 1'b0;
+        DMAREQ    <= 1'b0;
+        read_done <= 1'b0;
     end
     else begin
         DMAEN       <= dmax_ctl[4]     ;         //把DMAEN和DMAREQ信号放到状态机内部以便以后修改
@@ -218,9 +231,18 @@ always@(current_state or posedge puc_rst)begin
             WAIT_TRI      :    begin
             end
             READ          :    begin
-                
+                read_done <= 1'b0;
+                if(dma_ready_r == 1'b1)begin
+                    data_reg  <= dma_dout;
+                    read_done <= 1'b1;
+                end
+                else begin
+                    read_done <= 1'b0;
+                end
             end
-            WRITE         :
+            WRITE         :    begin
+                read_done <= 1'b0;
+            end
             MODIFY        :
             RELOAD        :
             RELOAD_REQ    :
