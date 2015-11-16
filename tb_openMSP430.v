@@ -319,7 +319,7 @@ initial
      p3_din                  = 8'h00;
      p4_din                  = 8'h00;
      p5_din                  = 8'h00;
-     p6_din                  = 8'h00;
+     p6_din                  = 8'haa;
      inclk                   = 1'b0;
      taclk                   = 1'b0;
      ta_cci0a                = 1'b0;

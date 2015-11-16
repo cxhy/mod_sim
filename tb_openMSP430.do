@@ -52,7 +52,8 @@ vsim -novopt tb_openMSP430
 #sim:/tb_openMSP430/dma_master_0/dma_dout \
 #sim:/tb_openMSP430/dma_master_0/dma_ready \
 #sim:/tb_openMSP430/dma_master_0/dma_resp
-add wave sim:/tb_openMSP430/template_periph_8b_0/*
+#add wave sim:/tb_openMSP430/template_periph_8b_0/*
+add wave sim:/tb_openMSP430/gpio_0/*
 radix -hex
 view wave
 run -all
