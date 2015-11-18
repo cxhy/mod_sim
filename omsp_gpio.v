@@ -38,7 +38,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 134 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2012-03-22 21:31:06 +0100 (Thu, 22 Mar 2012) $
+// $LastChangedDate:  2015-11-18 16:20:11
 //----------------------------------------------------------------------------
 
 module  omsp_gpio (
@@ -85,10 +85,10 @@ module  omsp_gpio (
 //============
 parameter           P1_EN = 1'b1;   // Enable Port 1
 parameter           P2_EN = 1'b1;   // Enable Port 2
-parameter           P3_EN = 1'b0;   // Enable Port 3
-parameter           P4_EN = 1'b0;   // Enable Port 4
-parameter           P5_EN = 1'b0;   // Enable Port 5
-parameter           P6_EN = 1'b0;   // Enable Port 6
+parameter           P3_EN = 1'b1;   // Enable Port 3
+parameter           P4_EN = 1'b1;   // Enable Port 4
+parameter           P5_EN = 1'b1;   // Enable Port 5
+parameter           P6_EN = 1'b1;   // Enable Port 6
 
 
 // OUTPUTs

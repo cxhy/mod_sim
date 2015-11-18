@@ -53,8 +53,70 @@ vsim -novopt tb_openMSP430
 #sim:/tb_openMSP430/dma_master_0/dma_ready \
 #sim:/tb_openMSP430/dma_master_0/dma_resp
 #add wave sim:/tb_openMSP430/template_periph_8b_0/*
-add wave sim:/tb_openMSP430/gpio_0/*
+#add wave sim:/tb_openMSP430/gpio_0/*
+#添加P3口和P6口的仿真信号
+add wave  \
+sim:/tb_openMSP430/gpio_0/P3_EN \
+sim:/tb_openMSP430/gpio_0/P6_EN
+add wave  \
+sim:/tb_openMSP430/gpio_0/P3_EN_MSK \
+sim:/tb_openMSP430/gpio_0/P6_EN_MSK
+add wave  \
+sim:/tb_openMSP430/gpio_0/P3IN \
+sim:/tb_openMSP430/gpio_0/P3OUT \
+sim:/tb_openMSP430/gpio_0/P3DIR \
+sim:/tb_openMSP430/gpio_0/P3SEL
+add wave  \
+sim:/tb_openMSP430/gpio_0/P6IN \
+sim:/tb_openMSP430/gpio_0/P6OUT \
+sim:/tb_openMSP430/gpio_0/P6DIR \
+sim:/tb_openMSP430/gpio_0/P6SEL
+add wave  \
+sim:/tb_openMSP430/gpio_0/p3_dout \
+sim:/tb_openMSP430/gpio_0/p3_dout_en \
+sim:/tb_openMSP430/gpio_0/p3_sel \
+sim:/tb_openMSP430/gpio_0/p6_dout \
+sim:/tb_openMSP430/gpio_0/p6_dout_en \
+sim:/tb_openMSP430/gpio_0/p6_sel \
+sim:/tb_openMSP430/gpio_0/per_dout \
+sim:/tb_openMSP430/gpio_0/mclk \
+sim:/tb_openMSP430/gpio_0/p3_din \
+sim:/tb_openMSP430/gpio_0/p6_din \
+sim:/tb_openMSP430/gpio_0/per_addr \
+sim:/tb_openMSP430/gpio_0/per_din \
+sim:/tb_openMSP430/gpio_0/per_en \
+sim:/tb_openMSP430/gpio_0/per_we \
+sim:/tb_openMSP430/gpio_0/puc_rst \
+sim:/tb_openMSP430/gpio_0/p3in \
+sim:/tb_openMSP430/gpio_0/p3out \
+sim:/tb_openMSP430/gpio_0/p3out_wr \
+sim:/tb_openMSP430/gpio_0/p3out_nxt \
+sim:/tb_openMSP430/gpio_0/p3dir \
+sim:/tb_openMSP430/gpio_0/p3dir_wr \
+sim:/tb_openMSP430/gpio_0/p3dir_nxt \
+sim:/tb_openMSP430/gpio_0/p3sel \
+sim:/tb_openMSP430/gpio_0/p3sel_wr \
+sim:/tb_openMSP430/gpio_0/p3sel_nxt \
+sim:/tb_openMSP430/gpio_0/p6in \
+sim:/tb_openMSP430/gpio_0/p6out \
+sim:/tb_openMSP430/gpio_0/p6out_wr \
+sim:/tb_openMSP430/gpio_0/p6out_nxt \
+sim:/tb_openMSP430/gpio_0/p6dir \
+sim:/tb_openMSP430/gpio_0/p6dir_wr \
+sim:/tb_openMSP430/gpio_0/p6dir_nxt \
+sim:/tb_openMSP430/gpio_0/p6sel \
+sim:/tb_openMSP430/gpio_0/p6sel_wr \
+sim:/tb_openMSP430/gpio_0/p6sel_nxt \
+sim:/tb_openMSP430/gpio_0/p3in_rd \
+sim:/tb_openMSP430/gpio_0/p3out_rd \
+sim:/tb_openMSP430/gpio_0/p3dir_rd \
+sim:/tb_openMSP430/gpio_0/p3sel_rd \
+sim:/tb_openMSP430/gpio_0/p6in_rd \
+sim:/tb_openMSP430/gpio_0/p6out_rd \
+sim:/tb_openMSP430/gpio_0/p6dir_rd \
+sim:/tb_openMSP430/gpio_0/p6sel_rd
+
 radix -hex
 view wave
-run -all
+run 100us
 
