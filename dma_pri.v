@@ -29,10 +29,10 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-19 23:47:25
+// $LastChangedDate:  2015-11-20 10:37:24
 //----------------------------------------------------------------------------
 //
-// *File Name: dma_priority.v 
+// *File Name: dma_pri.v 
 // 
 // *Module Description:
 //                       优先级控制模块，向下层提供当前激活的通道，提供通道传输触发信号
@@ -43,7 +43,7 @@
 //
 //---------------------------------------------------------------------------- 
 
-module  dma_priority (
+module  dma_pri (
                        mclk                      ,
                        puc_rst                   ,
 
@@ -203,7 +203,7 @@ assign     dma_priority = DMAONFETCH;
 //chax_tri  向下层输出的通道触发信号
 
 
-//always@(posedge mclk or negedge puc_rst)begin
+//always@(posedge mclk or posedge puc_rst)begin
 //    if(puc_rst == 1'b1)begin
 //        dma0_tri  <= 1'b0;
 //    end
@@ -217,7 +217,7 @@ assign     dma_priority = DMAONFETCH;
 
 //对dmaxtsel信号进行触发信号的归一化处理。
 //根据DMAxTSELx信号把输入的req或者其他的触发信号统一为dmax_tri
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         dma0_tri <= 1'b0;
     end
@@ -230,7 +230,7 @@ always@(posedge mclk or negedge puc_rst)begin
 end
 
 
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         dma1_tri  <= 1'b0;
     end
@@ -243,7 +243,7 @@ always@(posedge mclk or negedge puc_rst)begin
 end
 
 
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         dma2_tri  <= 1'b0;
     end
@@ -255,7 +255,7 @@ always@(posedge mclk or negedge puc_rst)begin
     end
 end
 
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         dma3_tri  <= 1'b0;
     end
@@ -268,7 +268,7 @@ always@(posedge mclk or negedge puc_rst)begin
 end
 
 
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         dma3_tri  <= 1'b0;
     end
@@ -282,7 +282,7 @@ end
 
 //状态机
 //
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         current_state <= IDLE;
     end
@@ -503,7 +503,7 @@ always@(*)begin
     end
 end
 
-always@(posedge mclk or negedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
         last_txf_cha <= 3'b0;
         cha0_tri     <= 1'b0;
