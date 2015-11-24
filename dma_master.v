@@ -124,28 +124,42 @@ parameter [DEC_WD-1:0] DMACTL0      = 'h22,
                        DMA2SA       = 'hF2,
                        DMA2DA       = 'hF4,
                        DMA2SZ       = 'hF6;
+                       DMA3CTL      = 'hD8,
+                       DMA3SA       = 'hDA,
+                       DMA3DA       = 'hDC,
+                       DMA3SZ       = 'hDE;
+                       DMA4CTL      = 'hD0,
+                       DMA4SA       = 'hD2,
+                       DMA4DA       = 'hD4,
+                       DMA4SZ       = 'hD6;                                              
+
 // Register one-hot decoder utilities
 parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter [DEC_SZ-1:0] DMACTL0_D    = (BASE_REG << DMACTL0),
-                       DMACTL1_D    = (BASE_REG << DMACTL1),
-                       DMA0CTL_D    = (BASE_REG << DMA0CTL),
-                       DMA0SA_D     = (BASE_REG << DMA0SA ),
-                       DMA0DA_D     = (BASE_REG << DMA0DA ),
-                       DMA0SZ_D     = (BASE_REG << DMA0SZ ),
-                       DMA1CTL_D    = (BASE_REG << DMA1CTL),
-                       DMA1SA_D     = (BASE_REG << DMA1SA ),
-                       DMA1DA_D     = (BASE_REG << DMA1DA ),
-                       DMA1SZ_D     = (BASE_REG << DMA1SZ ),
-                       DMA2CTL_D    = (BASE_REG << DMA2CTL),
-                       DMA2SA_D     = (BASE_REG << DMA2SA ),
-                       DMA2DA_D     = (BASE_REG << DMA2DA ),
-                       DMA2SZ_D     = (BASE_REG << DMA2SZ );
-
-
-
+parameter [DEC_SZ-1:0] DMACTL0_D          = (BASE_REG << DMACTL0),
+                       DMACTL1_D          = (BASE_REG << DMACTL1),
+                       DMA0CTL_D          = (BASE_REG << DMA0CTL),
+                       DMA0SA_D           = (BASE_REG << DMA0SA ),
+                       DMA0DA_D           = (BASE_REG << DMA0DA ),
+                       DMA0SZ_D           = (BASE_REG << DMA0SZ ),
+                       DMA1CTL_D          = (BASE_REG << DMA1CTL),
+                       DMA1SA_D           = (BASE_REG << DMA1SA ),
+                       DMA1DA_D           = (BASE_REG << DMA1DA ),
+                       DMA1SZ_D           = (BASE_REG << DMA1SZ ),
+                       DMA2CTL_D          = (BASE_REG << DMA2CTL),
+                       DMA2SA_D           = (BASE_REG << DMA2SA ),
+                       DMA2DA_D           = (BASE_REG << DMA2DA ),
+                       DMA2SZ_D           = (BASE_REG << DMA2SZ ),
+                       DMA3CTL_D          = (BASE_REG << DMA3CTL),
+                       DMA3SA_D           = (BASE_REG << DMA3SA ),
+                       DMA3DA_D           = (BASE_REG << DMA3DA ),
+                       DMA3SZ_D           = (BASE_REG << DMA3SZ ),
+                       DMA4CTL_D          = (BASE_REG << DMA4CTL),
+                       DMA4SA_D           = (BASE_REG << DMA4SA ),
+                       DMA4DA_D           = (BASE_REG << DMA4DA ),
+                       DMA4SZ_D           = (BASE_REG << DMA4SZ ); 
 
 //============================================================================
 // 2)  REGISTER DECODER
@@ -171,7 +185,16 @@ wire [DEC_SZ-1:0] reg_dec   =  (DMACTL0_D  &  {DEC_SZ{(reg_addr == DMACTL0 )}}) 
                                (DMA2CTL_D  &  {DEC_SZ{(reg_addr == DMA2CTL )}})  |
                                (DMA2SA_D   &  {DEC_SZ{(reg_addr == DMA2SA  )}})  |
                                (DMA2DA_D   &  {DEC_SZ{(reg_addr == DMA2DA  )}})  |
-                               (DMA2SZ_D   &  {DEC_SZ{(reg_addr == DMA2SZ  )}});
+                               (DMA2SZ_D   &  {DEC_SZ{(reg_addr == DMA2SZ  )}})  |
+                               (DMA3CTL_D  &  {DEC_SZ{(reg_addr == DMA3CTL )}})  |
+                               (DMA3SA_D   &  {DEC_SZ{(reg_addr == DMA3SA  )}})  |
+                               (DMA3DA_D   &  {DEC_SZ{(reg_addr == DMA3DA  )}})  |
+                               (DMA3SZ_D   &  {DEC_SZ{(reg_addr == DMA3SZ  )}})  |
+                               (DMA4CTL_D  &  {DEC_SZ{(reg_addr == DMA4CTL )}})  |
+                               (DMA4SA_D   &  {DEC_SZ{(reg_addr == DMA4SA  )}})  |
+                               (DMA4DA_D   &  {DEC_SZ{(reg_addr == DMA4DA  )}})  |
+                               (DMA4SZ_D   &  {DEC_SZ{(reg_addr == DMA4SZ  )}})  ;
+
 
 
 // Read/Write probes
