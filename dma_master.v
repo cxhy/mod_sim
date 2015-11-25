@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2009 , Olivier Girard
+// Copyright (C) 2009 , Guo Dezheng
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -26,20 +26,23 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
+// $Rev:  $
+// $CreatDate:   2015-11-06 11:57:15
+// $LastChangedBy: guodezheng $
+// $LastChangedDate:  2015-11-25 15:35:39
+//----------------------------------------------------------------------------
 //
-// *File Name: dma_master.v
-//
+// *File Name: dma_master.v 
+// 
 // *Module Description:
-//                       dma主机
+//                       DMA主机
 //
 // *Author(s):
-//              - guodezheng,    cxhy1981@gmail.com
+//              - Guodezheng cxhy1981@gmail.com,
 //
 //----------------------------------------------------------------------------
-// $Rev: 134 $
-// $LastChangedBy: guodezheng $
-// $LastChangedDate: 2015/10/6 星期二 12:02:45 $
-//----------------------------------------------------------------------------
+
+
 
 module  dma_master (
 
@@ -361,6 +364,87 @@ wire        dma2_sz_wr = reg_wr[DMA2SZ];
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        dma2_sz <=  16'h0000;
   else if (dma2_sz_wr) dma2_sz <=  per_din;
+
+// dma3ctl Register
+//-----------------
+reg  [15:0] dma3_ctl;
+
+wire        dma3_ctl_wr = reg_wr[DMA3CTL];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma3_ctl <=  16'h0000;
+  else if (dma3_ctl_wr) dma3_ctl <=  per_din;
+
+// dma3sa Register
+//-----------------
+reg  [15:0] dma3_sa;
+
+wire        dma3_sa_wr = reg_wr[DMA3SA];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma3_sa <=  16'h0000;
+  else if (dma3_sa_wr) dma3_sa <=  per_din;
+
+// dma3da Register
+//-----------------
+reg  [15:0] dna3_da;
+
+wire        dna3_da_wr = reg_wr[DMA3DA];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dna3_da <=  16'h0000;
+  else if (dna3_da_wr) dna3_da <=  per_din;
+
+// dma3sz Register
+//-----------------
+reg  [15:0] dma3_sz;
+
+wire        dma3_sz_wr = reg_wr[DMA3SZ];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma3_sz <=  16'h0000;
+  else if (dma3_sz_wr) dma3_sz <=  per_din;
+  
+
+// dma4ctl Register
+//-----------------
+reg  [15:0] dma4_ctl;
+
+wire        dma4_ctl_wr = reg_wr[DMA4CTL];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma4_ctl <=  16'h0000;
+  else if (dma4_ctl_wr) dma4_ctl <=  per_din;
+
+// dma4sa Register
+//-----------------
+reg  [15:0] dma4_sa;
+
+wire        dma4_sa_wr = reg_wr[DMA4SA];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma4_sa <=  16'h0000;
+  else if (dma4_sa_wr) dma4_sa <=  per_din;
+
+// dma4da Register
+//-----------------
+reg  [15:0] dma4_da;
+
+wire        dma4_da_wr = reg_wr[DMA4DA];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma4_da <=  16'h0000;
+  else if (dma4_da_wr) dma4_da <=  per_din;
+
+// dma4sz Register
+//-----------------
+reg  [15:0] dma4_sz;
+
+wire        dma4_sz_wr = reg_wr[DMA4SZ];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        dma4_sz <=  16'h0000;
+  else if (dma4_sz_wr) dma4_sz <=  per_din;  
 
 //============================================================================
 // 4) DATA OUTPUT GENERATION
