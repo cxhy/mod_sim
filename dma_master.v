@@ -29,9 +29,8 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-25 15:35:39
+// $LastChangedDate:  2015-11-26 10:33:14
 //----------------------------------------------------------------------------
-//
 // *File Name: dma_master.v 
 // 
 // *Module Description:
@@ -74,7 +73,7 @@ assign nmi                     = 1'b0;
 //assign dma_addr                = 15'h0000;
 //assign dma_din                 = 16'h0000;
 //assign dma_en                  = 1'b0;
-assign dma_priority            = 1'b0;
+// assign dma_priority            = 1'b0;
 //assign dma_we                  = 2'b00;
 assign dma_wkup                = 1'b0;
 //wire     dma_en
@@ -126,11 +125,11 @@ parameter [DEC_WD-1:0] DMACTL0      = 'h22,
                        DMA2CTL      = 'hF0,
                        DMA2SA       = 'hF2,
                        DMA2DA       = 'hF4,
-                       DMA2SZ       = 'hF6;
+                       DMA2SZ       = 'hF6,
                        DMA3CTL      = 'hD8,
                        DMA3SA       = 'hDA,
                        DMA3DA       = 'hDC,
-                       DMA3SZ       = 'hDE;
+                       DMA3SZ       = 'hDE,
                        DMA4CTL      = 'hD0,
                        DMA4SA       = 'hD2,
                        DMA4DA       = 'hD4,
@@ -387,13 +386,14 @@ always @ (posedge mclk or posedge puc_rst)
 
 // dma3da Register
 //-----------------
-reg  [15:0] dna3_da;
+reg  [15:0] dma3_da;
 
-wire        dna3_da_wr = reg_wr[DMA3DA];
+wire        dma3_da_wr = reg_wr[DMA3DA];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        dna3_da <=  16'h0000;
-  else if (dna3_da_wr) dna3_da <=  per_din;
+  if (puc_rst)        dma3_da <=  16'h0000;
+  else if (dma3_da_wr) dma3_da <=  per_din;
+  
 
 // dma3sz Register
 //-----------------
@@ -490,6 +490,8 @@ wire [15:0] per_dout   =  dma_ctl0_rd   |
 wire [3:0]                 dma0_tsel    ;
 wire [3:0]                 dma1_tsel    ;
 wire [3:0]                 dma2_tsel    ;
+wire [3:0]                 dma3_tsel    ;
+wire [3:0]                 dma4_tsel    ;
 
 wire                       dma0_wkup     ;   
 wire                       dma0_en       ;   
@@ -513,6 +515,20 @@ wire  [15:0]               dma2_din      ;
 wire  [1:0]                dma2_we       ;   
 wire                       dma2_priority ;   
 
+wire                       dma3_wkup     ;   
+wire                       dma3_en       ;   
+wire  [14:0]               dma3_addr     ;   
+wire  [15:0]               dma3_din      ;   
+wire  [1:0]                dma3_we       ;   
+wire                       dma3_priority ;   
+
+wire                       dma4_wkup     ;   
+wire                       dma4_en       ;   
+wire  [14:0]               dma4_addr     ;   
+wire  [15:0]               dma4_din      ;   
+wire  [1:0]                dma4_we       ;   
+wire                       dma4_priority ;   
+
 
 
 
@@ -522,36 +538,79 @@ wire                       dma2_priority ;
 assign dma0_tsel = dma_ctl0[3:0]  ;
 assign dma1_tsel = dma_ctl0[7:4]  ;
 assign dma2_tsel = dma_ctl0[11:8] ;
+assign dma3_tsel = dma_ctl0[15:12] ;
+assign dma4_tsel = dma_ctl0[15:12] ;
 
-dma_priority dma_priority_u (
-    .mclk                        (mclk),
-    .puc_rst                     (puc_rst),
-    
-    .dma_ctl0                    (dma_ctl0),
-    .dma_ctl1                    (dma_ctl1),
-    .dma0_ctl                    (dma0_ctl),
-    .dma0_sa                     (dma0_sa),
-    .dma0_da                     (dma0_da),
-    .dma0_sz                     (dma0_sz),
-    .dma1_ctl                    (dma1_ctl),
-    .dma1_sa                     (dma1_sa),
-    .dma1_da                     (dma1_da),
-    .dma1_sz                     (dma1_sz),
-    .dma2_ctl                    (dma2_ctl),
-    .dma2_sa                     (dma2_sa),
-    .dma2_da                     (dma2_da),
-    .dma2_sz                     (dma2_sz),  
-    
-    .cha0_tf_done                (cha0_tf_done),
-    .cha1_tf_done                (cha1_tf_done),
-    .cha2_tf_done                (cha2_tf_done),
-    
+dma_pri  dma_pri_u(
+                       .mclk                      (mclk        ),
+                       .puc_rst                   (puc_rst     ),
 
-    .dma_priority                (dma_priority),
-    .cha0_tri                    (cha0_tri    ),
-    .cha1_tri                    (cha1_tri    ),
-    .cha2_tri                    (cha2_tri    )
+                       .dma_ctl0                  (dma_ctl0    ),
+                       .dma_ctl1                  (dma_ctl1    ),
+                       .dma0_ctl                  (dma0_ctl    ),
+                       .dma0_sa                   (dma0_sa     ),
+                       .dma0_da                   (dma0_da     ),
+                       .dma0_sz                   (dma0_sz     ),
+                       .dma1_ctl                  (dma1_ctl    ),
+                       .dma1_sa                   (dma1_sa     ),
+                       .dma1_da                   (dma1_da     ),
+                       .dma1_sz                   (dma1_sz     ),
+                       .dma2_ctl                  (dma2_ctl    ),
+                       .dma2_sa                   (dma2_sa     ),
+                       .dma2_da                   (dma2_da     ),
+                       .dma2_sz                   (dma2_sz     ),
+                       .dma3_ctl                  (dma3_ctl    ),
+                       .dma3_sa                   (dma3_sa     ),
+                       .dma3_da                   (dma3_da     ),
+                       .dma3_sz                   (dma3_sz     ),
+                       .dma4_ctl                  (dma4_ctl    ),
+                       .dma4_sa                   (dma4_sa     ),
+                       .dma4_da                   (dma4_da     ),
+                       .dma4_sz                   (dma4_sz     ),  
+
+                       .cha0_tf_done              (cha0_tf_done),
+                       .cha1_tf_done              (cha1_tf_done),
+                       .cha2_tf_done              (cha2_tf_done),
+                       .cha3_tf_done              (cha3_tf_done),
+                       .cha4_tf_done              (cha4_tf_done),
+                       
+                       .dma_priority              (dma_priority),
+                       .cha0_tri                  (cha0_tri    ),
+                       .cha1_tri                  (cha1_tri    ),
+                       .cha2_tri                  (cha2_tri    ),
+                       .cha3_tri                  (cha3_tri    ),
+                       .cha4_tri                  (cha4_tri    )
 );
+
+// dma_priority dma_priority_u (
+//     .mclk                        (mclk),
+//     .puc_rst                     (puc_rst),
+    
+//     .dma_ctl0                    (dma_ctl0),
+//     .dma_ctl1                    (dma_ctl1),
+//     .dma0_ctl                    (dma0_ctl),
+//     .dma0_sa                     (dma0_sa),
+//     .dma0_da                     (dma0_da),
+//     .dma0_sz                     (dma0_sz),
+//     .dma1_ctl                    (dma1_ctl),
+//     .dma1_sa                     (dma1_sa),
+//     .dma1_da                     (dma1_da),
+//     .dma1_sz                     (dma1_sz),
+//     .dma2_ctl                    (dma2_ctl),
+//     .dma2_sa                     (dma2_sa),
+//     .dma2_da                     (dma2_da),
+//     .dma2_sz                     (dma2_sz),  
+    
+//     .cha0_tf_done                (cha0_tf_done),
+//     .cha1_tf_done                (cha1_tf_done),
+//     .cha2_tf_done                (cha2_tf_done),
+    
+
+//     .dma_priority                (dma_priority),
+//     .cha0_tri                    (cha0_tri    ),
+//     .cha1_tri                    (cha1_tri    ),
+//     .cha2_tri                    (cha2_tri    )
+// );
 
 dma_channel dma_channel_u0(
     .mclk                        (mclk),
@@ -626,11 +685,59 @@ dma_channel dma_channel_u2(
 //    .dma_priority                (dma2_priority)
 );
 
-assign dma_wkup       =   dma0_wkup | dma1_wkup | dma2_wkup ;  
-assign dma_en         =   dma0_en   | dma1_en   | dma2_en   ;  
-assign dma_addr       =   dma0_addr | dma1_addr | dma2_addr ;  
-assign dma_din        =   dma0_din  | dma1_din  | dma2_din  ;  
-assign dma_we         =   dma0_we   | dma1_we   | dma2_we   ;  
+dma_channel dma_channel_u3(
+    .mclk                        (mclk),
+    .puc_rst                     (puc_rst),
+                                   
+    .dmax_ctl                    (dma3_ctl),
+    .dmax_sa                     (dma3_sa), 
+    .dmax_da                     (dma3_da), 
+    .dmax_sz                     (dma3_sz), 
+    .dmax_tsel                   (dma3_tsel),
+                                   
+    .trigger                     (cha3_tri),
+    .transfer_done               (cha3_tf_done),
+                                   
+    .dma_ready                   (dma_ready),
+    .dma_resp                    (dma_resp), 
+    .dma_dout                    (dma_dout), 
+    .dma_wkup                    (dma3_wkup    ),
+    .dma_en                      (dma3_en      ),
+    .dma_addr                    (dma3_addr    ),
+    .dma_din                     (dma3_din     ),
+    .dma_we                      (dma3_we      )
+//    .dma_priority                (dma2_priority)
+);
+
+dma_channel dma_channel_u4(
+    .mclk                        (mclk),
+    .puc_rst                     (puc_rst),
+                                   
+    .dmax_ctl                    (dma4_ctl),
+    .dmax_sa                     (dma4_sa), 
+    .dmax_da                     (dma4_da), 
+    .dmax_sz                     (dma4_sz), 
+    .dmax_tsel                   (dma4_tsel),
+                                   
+    .trigger                     (cha4_tri),
+    .transfer_done               (cha4_tf_done),
+                                   
+    .dma_ready                   (dma_ready),
+    .dma_resp                    (dma_resp), 
+    .dma_dout                    (dma_dout), 
+    .dma_wkup                    (dma4_wkup    ),
+    .dma_en                      (dma4_en      ),
+    .dma_addr                    (dma4_addr    ),
+    .dma_din                     (dma4_din     ),
+    .dma_we                      (dma4_we      )
+//    .dma_priority                (dma2_priority)
+);
+
+assign dma_wkup       =   dma0_wkup | dma1_wkup | dma2_wkup | dma3_wkup | dma4_wkup ;  
+assign dma_en         =   dma0_en   | dma1_en   | dma2_en   | dma3_en   | dma4_en   ;  
+assign dma_addr       =   dma0_addr | dma1_addr | dma2_addr | dma3_addr | dma4_addr ;  
+assign dma_din        =   dma0_din  | dma1_din  | dma2_din  | dma3_din  | dma4_din  ;  
+assign dma_we         =   dma0_we   | dma1_we   | dma2_we   | dma3_we   | dma4_we   ;  
 
 
 

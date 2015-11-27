@@ -6,7 +6,7 @@ vlog -work work openMSP430.v
 
 
 vcom -work work dma_channel.vhd
-vlog -work work dma_priority.v
+vlog -work work dma_pri.v
 vlog -work work dma_master.v
 
 vlog -work work io_cell.v
@@ -43,11 +43,11 @@ vlog -work work template_periph_16b.v
 vlog -work work timescale.v
 
 vsim -do {.\tb_openMSP430.do} -novopt work.tb_openMSP430
-add wave -position insertpoint sim:/tb_openMSP430/gpio_0/*
+
 
 
 #vsim -novopt tb_openMSP430
-#add wave sim:/tb_openMSP430/dma_master_0/dma_priority_u/*
+add wave sim:/tb_openMSP430/dma_master_0/dma_channel_u3/*
 #add wave  \
 #sim:/tb_openMSP430/dma_master_0/dma_addr \
 #sim:/tb_openMSP430/dma_master_0/dma_din \

@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-20 10:37:24
+// $LastChangedDate:  2015-11-26 10:40:48
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_pri.v 
@@ -74,13 +74,13 @@ module  dma_pri (
                        cha2_tf_done              ,
                        cha3_tf_done              ,
                        cha4_tf_done              ,
+
                        dma_priority              ,
                        cha0_tri                  ,
                        cha1_tri                  ,
                        cha2_tri                  ,
                        cha3_tri                  ,
                        cha4_tri                  
-
 );
 
 input                                   mclk     ;
@@ -291,20 +291,20 @@ always@(posedge mclk or posedge puc_rst)begin
     end
 end
 
-//FSM for sim
-// synthesis translate_off
-reg                [63:0]                state_ascii;
-always @ ( * ) begin
-        case(current_state)
-            6'b00_0001  :  state_ascii  <= "IDLE" ;  
-            6'b00_0010  :  state_ascii  <= "CHA0" ; 
-            6'b00_0100  :  state_ascii  <= "CHA1" ; 
-            6'b00_1000  :  state_ascii  <= "CHA2" ; 
-            6'b01_0000  :  state_ascii  <= "CHA3" ; 
-            6'b10_0000  :  state_ascii  <= "CHA4" ; 
-            default     :  state_ascii  <= "ERROR";
-        endcase
-end
+// //FSM for sim
+// // synthesis translate_off
+// reg                [63:0]                state_ascii;
+// always @ ( * ) begin
+//         case(current_state)
+//             6'b00_0001  :  state_ascii  <= "IDLE" ;  
+//             6'b00_0010  :  state_ascii  <= "CHA0" ; 
+//             6'b00_0100  :  state_ascii  <= "CHA1" ; 
+//             6'b00_1000  :  state_ascii  <= "CHA2" ; 
+//             6'b01_0000  :  state_ascii  <= "CHA3" ; 
+//             6'b10_0000  :  state_ascii  <= "CHA4" ; 
+//             default     :  state_ascii  <= "ERROR";
+//         endcase
+// end
 
 //idle ： 是否是循环优先级，如果不是，那么判断通道0是否有触发信号，如果有，则进入状态CHA0
 //当通道0无触发信号是，则判断通道1。类似直到通道2.如果通道2仍然没有触发信号，则留在本状态
@@ -446,7 +446,7 @@ always@(*)begin
                  //之前传输通道是4，当前传输优先级为0-1-2-3-4        
                     else if(last_txf_cha == 5'b00_100)begin
                         if(dma0_tri)begin
-                            next_state <= CHA;
+                            next_state <= CHA0;
                         end
                         else if(dma1_tri)begin
                             next_state <= CHA1;
@@ -541,6 +541,23 @@ always@(posedge mclk or posedge puc_rst)begin
         endcase
     end
 end
+
+
+//FSM for sim
+// synthesis translate_off
+reg                [63:0]                state_ascii;
+always @ ( * ) begin
+        case(current_state)
+        IDLE       :        state_ascii        <= "IDLE   ";
+        CHA0       :        state_ascii        <= "CHA0   ";
+        CHA1       :        state_ascii        <= "CHA1   ";
+        CHA2       :        state_ascii        <= "CHA2   ";
+        CHA3       :        state_ascii        <= "CHA3   ";    
+        CHA4       :        state_ascii        <= "CHA4   ";    
+        default    :        state_ascii        <= "default";
+        endcase
+end
+// synthesis translate_on
 
 
 
