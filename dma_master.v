@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-26 10:33:14
+// $LastChangedDate:  2015-11-30 16:26:44
 //----------------------------------------------------------------------------
 // *File Name: dma_master.v 
 // 
@@ -468,6 +468,14 @@ wire [15:0] dma2_ctl_rd  = dma2_ctl  & {16{reg_rd[DMA2CTL]}};
 wire [15:0] dma2_sa_rd   = dma2_sa   & {16{reg_rd[DMA2SA]}};
 wire [15:0] dma2_da_rd   = dma2_da   & {16{reg_rd[DMA2DA]}};
 wire [15:0] dma2_sz_rd   = dma2_sz   & {16{reg_rd[DMA2SZ]}};
+wire [15:0] dma3_ctl_rd  = dma3_ctl  & {16{reg_rd[DMA2CTL]}};
+wire [15:0] dma3_sa_rd   = dma3_sa   & {16{reg_rd[DMA2SA]}};
+wire [15:0] dma3_da_rd   = dma3_da   & {16{reg_rd[DMA2DA]}};
+wire [15:0] dma3_sz_rd   = dma3_sz   & {16{reg_rd[DMA2SZ]}};
+wire [15:0] dma4_ctl_rd  = dma4_ctl  & {16{reg_rd[DMA2CTL]}};
+wire [15:0] dma4_sa_rd   = dma4_sa   & {16{reg_rd[DMA2SA]}};
+wire [15:0] dma4_da_rd   = dma4_da   & {16{reg_rd[DMA2DA]}};
+wire [15:0] dma4_sz_rd   = dma4_sz   & {16{reg_rd[DMA2SZ]}};
 
 
 wire [15:0] per_dout   =  dma_ctl0_rd   |
@@ -483,7 +491,15 @@ wire [15:0] per_dout   =  dma_ctl0_rd   |
                           dma2_ctl_rd   |
                           dma2_sa_rd    |
                           dma2_da_rd    |
-                          dma2_sz_rd   ;
+                          dma2_sz_rd    |
+                          dma3_ctl_rd   |
+                          dma3_sa_rd    |
+                          dma3_da_rd    |
+                          dma3_sz_rd    |
+                          dma4_ctl_rd   |
+                          dma4_sa_rd    |
+                          dma4_da_rd    |
+                          dma4_sz_rd    ;
 
 //========================================================            
 

@@ -38,7 +38,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2015-07-15 22:59:52 +0200 (Wed, 15 Jul 2015) $
+// $LastChangedDate:  2015-11-30 16:40:48
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -180,6 +180,10 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)  dma_ready_dly <=  1'b0;
   else          dma_ready_dly <=  dma_ready;
 
+// reg         dma_ready_dly2;
+// always @ (posedge mclk or posedge puc_rst)
+//   if (puc_rst)  dma_ready_dly2 <=  1'b0;
+//   else          dma_ready_dly2 <=  dma_ready_dly;
 // Mux between debug and master interface
 assign      ext_mem_en    =  dbg_mem_en | dma_en;
 wire  [1:0] ext_mem_wr    =  dbg_mem_en ? dbg_mem_wr    :  dma_we;
