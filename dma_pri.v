@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-26 10:40:48
+// $LastChangedDate:  2015-12-01 11:33:57
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_pri.v 
@@ -384,7 +384,7 @@ always@(*)begin
                         end
                     end
                 //之前传输通道是1，当前传输优先级为2-3-4-0-1
-                    else if(last_txf_cha ==  5'b00_001)begin
+                    else if(last_txf_cha ==  5'b00_010)begin
                         if(dma2_tri)begin
                             next_state <= CHA2;
                         end
@@ -424,7 +424,7 @@ always@(*)begin
                         end
                     end
                  //之前传输通道是3，当前传输优先级为4-0-1-2-3
-                    else if(last_txf_cha == 5'b00_100)begin
+                    else if(last_txf_cha == 5'b01_000)begin
                         if(dma4_tri)begin
                             next_state <= CHA4;
                         end
@@ -444,7 +444,7 @@ always@(*)begin
                         end
                     end
                  //之前传输通道是4，当前传输优先级为0-1-2-3-4        
-                    else if(last_txf_cha == 5'b00_100)begin
+                    else if(last_txf_cha == 5'b10_000)begin
                         if(dma0_tri)begin
                             next_state <= CHA0;
                         end
