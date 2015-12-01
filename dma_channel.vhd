@@ -52,11 +52,9 @@ SIGNAL dma_req : STD_LOGIC;
 
 TYPE ISTATE IS(reset,load,idle,wft,rd_mem,wr_mem,modify,reload,rst_req,rst);
 SIGNAL state : ISTATE;
-
 SIGNAL T_size : INTEGER;
 SIGNAL T_sourceADD : STD_LOGIC_VECTOR(15 DOWNTO 0);
 SIGNAL T_destADD : STD_LOGIC_VECTOR(15 DOWNTO 0);
-
 SIGNAL trigger_pos : STD_LOGIC;
 SIGNAL trigger_r : STD_LOGIC;
 SIGNAL trigger_sel : STD_LOGIC;
