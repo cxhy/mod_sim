@@ -61,28 +61,30 @@ vsim -do {.\tb_openMSP430.do} -novopt work.tb_openMSP430
 #add wave sim:/tb_openMSP430/gpio_0/*
 ##添加P3口和P6口的仿真信号
 
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_en
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_sel
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/eu_per_en
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_en
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_sel
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/eu_per_en
+#
+#add wave  \
+#sim:/tb_openMSP430/dut/dma_dout
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/dmem_dout
+#add wave  \
+#sim:/tb_openMSP430/dmem_dout
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din_sel
+#
+#add wave  \
+#sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_en
 
-add wave  \
-sim:/tb_openMSP430/dut/dma_dout
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/dmem_dout
-add wave  \
-sim:/tb_openMSP430/dmem_dout
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din_sel
-
-add wave  \
-sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_en
+add wave sim:/tb_openMSP430/dma_master_0/dma_channel_u3/*
 
 radix -hex
 view wave
-run 100us
+run 500us
 

@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-01 11:33:57
+// $LastChangedDate:  2015-12-02 11:32:24
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_pri.v 
@@ -171,12 +171,12 @@ wire                                   ROUNDROBIN   ;
 wire                                   DMAONFETCH   ;
 
 
-parameter IDLE       = 6'b00_0001;
-parameter CHA0       = 6'b00_0010;
-parameter CHA1       = 6'b00_0100;
-parameter CHA2       = 6'b00_1000;
-parameter CHA3       = 6'b01_0000;
-parameter CHA4       = 6'b10_0000;
+parameter IDLE       = 6'b00_0001;   //01
+parameter CHA0       = 6'b00_0010;   //02
+parameter CHA1       = 6'b00_0100;   //04
+parameter CHA2       = 6'b00_1000;   //08
+parameter CHA3       = 6'b01_0000;   //10
+parameter CHA4       = 6'b10_0000;   //20
 reg       [5:0]      current_state;
 reg       [5:0]      next_state   ;
 
