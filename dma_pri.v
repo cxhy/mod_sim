@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-02 11:32:24
+// $LastChangedDate:  2015-12-07 17:34:07
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_pri.v 
@@ -270,12 +270,12 @@ end
 
 always@(posedge mclk or posedge puc_rst)begin
     if(puc_rst == 1'b1)begin
-        dma3_tri  <= 1'b0;
+        dma4_tri  <= 1'b0;
     end
     else begin
         case(DMA3TSELx)
-            0000    : dma3_tri <= dma3req;
-            default : dma3_tri <= 1'b0;
+            0000    : dma4_tri <= dma4req;
+            default : dma4_tri <= 1'b0;
         endcase
     end
 end
