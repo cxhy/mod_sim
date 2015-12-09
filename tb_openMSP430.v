@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2015-07-15 22:59:52 +0200 (Wed, 15 Jul 2015) $
+// $LastChangedDate:  2015-12-09 14:43:36
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -111,7 +111,7 @@ reg          [7:0] p6_din;
 
 // Peripheral templates
 wire        [15:0] per_dout_temp_8b;
-wire        [15:0] per_dout_temp_16b;   
+wire        [15:0] per_dout_temp_16b;
 wire        [15:0] per_dout_dma;
 
 // Timer A
@@ -567,27 +567,27 @@ template_periph_16b  template_periph_16b_0 (
 
 dma_master dma_master_0(
      // OUTPUTs
-    .per_dout         (per_dout_dma),              // Peripheral data output                                                
-                                                                                                                        
-    .dma_addr         (dma_addr),              // Direct Memory Access address                                          
-    .dma_din          (dma_din),               // Direct Memory Access data input                                       
-    .dma_en           (dma_en),                // Direct Memory Access enable (high active)                             
-    .dma_priority     (dma_priority),          // Direct Memory Access priority (0:low / 1:high)                        
-    .dma_we           (dma_we),                // Direct Memory Access write byte enable (high active)                  
-    .dma_wkup         (dma_wkup),              // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)      
-    .nmi              (nmi),                   // Non-maskable interrupt (asynchronous)                                 
-                                                                                                                   
-      // INPUTs       (),                                                                                               
-    .mclk             (mclk),                  // Main system clock                                                     
-    .per_addr         (per_addr),              // Peripheral address                                                    
-    .per_din          (per_din),               // Peripheral data input                                                 
-    .per_en           (per_en),                // Peripheral enable (high active)                                       
-    .per_we           (per_we),                // Peripheral write enable (high active)                                 
-    .puc_rst          (puc_rst),               // Main system reset                                                     
-                                                                                                                      
-   .dma_dout         (dma_dout),              // Direct Memory Access data output                                      
-   .dma_ready        (dma_ready),             // Direct Memory Access is complete                                      
-   .dma_resp         (dma_resp)               // Direct Memory Access response (0:Okay / 1:Error)                      
+    .per_dout         (per_dout_dma),              // Peripheral data output
+
+    .dma_addr         (dma_addr),              // Direct Memory Access address
+    .dma_din          (dma_din),               // Direct Memory Access data input
+    .dma_en           (dma_en),                // Direct Memory Access enable (high active)
+    .dma_priority     (dma_priority),          // Direct Memory Access priority (0:low / 1:high)
+    .dma_we           (dma_we),                // Direct Memory Access write byte enable (high active)
+    .dma_wkup         (dma_wkup),              // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
+    .nmi              (nmi),                   // Non-maskable interrupt (asynchronous)
+
+      // INPUTs       (),
+    .mclk             (mclk),                  // Main system clock
+    .per_addr         (per_addr),              // Peripheral address
+    .per_din          (per_din),               // Peripheral data input
+    .per_en           (per_en),                // Peripheral enable (high active)
+    .per_we           (per_we),                // Peripheral write enable (high active)
+    .puc_rst          (puc_rst),               // Main system reset
+
+   .dma_dout         (dma_dout),              // Direct Memory Access data output
+   .dma_ready        (dma_ready),             // Direct Memory Access is complete
+   .dma_resp         (dma_resp)               // Direct Memory Access response (0:Okay / 1:Error)
 
 
 

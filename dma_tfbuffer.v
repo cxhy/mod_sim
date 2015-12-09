@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-19 15:21:53
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-08 17:04:44
+// $LastChangedDate:  2015-12-09 17:32:03
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_tfbuffer.v
@@ -48,108 +48,112 @@
 
 module dma_tfbuffer(
     //Inputs
-    mclk,
-    //外设总线
-    per_addr,                       // Peripheral address
-    per_din,                        // Peripheral data input
-    per_en,                         // Peripheral enable (high active)
-    per_we,                         // Peripheral write enable (high active)
-    puc_rst,                        // Main system reset
-
-    decoder_buffer,
-    encoder_buffer,
-
+    ,
     //Outputs
 
-    per_dout
 );
 
-input              mclk;            // Main system clock
-input       [13:0] per_addr;        // Peripheral address
-input       [15:0] per_din;         // Peripheral data input
-input              per_en;          // Peripheral enable (high active)
-input        [1:0] per_we;          // Peripheral write enable (high active)
-input              puc_rst;         // Main system reset
-input        [7:0] decoder_buffer;
-input        [7:0] encoder_buffer;
-
-output      [15:0] per_dout;        // Peripheral data output
-
-//=============================================================================
-// 1)  PARAMETER DECLARATION
-//=============================================================================
-
-// Register base address (must be aligned to decoder bit width)
-parameter       [14:0] BASE_ADDR   = 15'h01cc;
-
-// Decoder bit width (defines how many bits are considered for address decoding)
-parameter              DEC_WD      =  1;
-
-// Register addresses offset
-parameter [DEC_WD-1:0] DECODER_BUFFER      =  'h0,
-                       ENCODER_BUFFER      =  'h1;
-
-
-// Register one-hot decoder utilities
-parameter              DEC_SZ      =  (1 << DEC_WD);              //size == 2
-parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};   //base_reg == {01}
-
-// Register one-hot decoder
-parameter [DEC_SZ-1:0] DECODER_BUFFER_D  = (BASE_REG << CNTRL1),  //DECODER_BUFFER_D = 01cc << 0   [1:0]01cc 00
-                       ENCODER_BUFFER_D  = (BASE_REG << CNTRL2);  //ENCODER_BUFFER_D = 01cc << 1   [1:0]01ce 10
-
-
-//============================================================================
-// 2)  REGISTER DECODER
-//============================================================================
-
-// Local register selection
-wire              reg_sel      =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]); //per_addr[13:1] == BASE_ADDR[14:2]
-
-// Register local address
-wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};// reg_addr = {0,per_addr[0]}
-
-// Register address decode
-wire [DEC_SZ-1:0] reg_dec      = (DECODER_BUFFER_D  &  {DEC_SZ{(reg_addr==(DECODER_BUFFER >>1))}}) |
-                                 (ENCODER_BUFFER_D  &  {DEC_SZ{(reg_addr==(ENCODER_BUFFER >>1))}}) ;
-
-// Read/Write probes
-wire              reg_lo_write =  per_we[0] & reg_sel;
-wire              reg_hi_write =  per_we[1] & reg_sel;
-wire              reg_read     = ~|per_we   & reg_sel;
-
-// Read/Write vectors
-wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
-wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
-wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
-
-//============================================================================
-// 3) REGISTERS
-//============================================================================
-
-//de_buffer Register
-//-----------------
-reg  [15:0] de_buffer;
-
-wire        de_buffer_wr = reg_wr[offset];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        de_buffer <=  16'h0000;
-  else if (de_buffer_wr) de_buffer <=  per_din;
-
-// CNTRL1 Register
-//-----------------
-
-wire       cntrl1_wr  = CNTRL1[0] ? reg_hi_wr[CNTRL1] : reg_lo_wr[CNTRL1];
-wire [7:0] cntrl1_nxt = CNTRL1[0] ? per_din[15:8]     : per_din[7:0];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        cntrl1 <=  8'h00;
-  else if (cntrl1_wr) cntrl1 <=  cntrl1_nxt;
-
-
+input         wire  ;
+output        reg   ;
 
 endmoudle //dma_tfbuffer.v
+
+// module dma_tfbuffer(
+//     //Inputs
+//     mclk,
+//     //外设总线
+//     per_addr,                       // Peripheral address
+//     per_din,                        // Peripheral data input
+//     per_en,                         // Peripheral enable (high active)
+//     per_we,                         // Peripheral write enable (high active)
+//     puc_rst,                        // Main system reset
+
+//     decoder_buffer_din,
+//     encoder_buffer_din,
+
+//     //Outputs
+//     decoder_buffer_dout,
+//     encoder_buffer_dout,
+//     per_dout
+// );
+
+// input              mclk;            // Main system clock
+// input       [13:0] per_addr;        // Peripheral address
+// input       [15:0] per_din;         // Peripheral data input
+// input              per_en;          // Peripheral enable (high active)
+// input        [1:0] per_we;          // Peripheral write enable (high active)
+// input              puc_rst;         // Main system reset
+// input        [7:0] decoder_buffer;
+// input        [7:0] encoder_buffer;
+
+// output      [15:0] per_dout;        // Peripheral data output
+
+// //=============================================================================
+// // 1)  PARAMETER DECLARATION
+// //=============================================================================
+
+// // Register base address (must be aligned to decoder bit width)
+// parameter       [14:0] BASE_ADDR   = 15'h01cc;
+
+// // Decoder bit width (defines how many bits are considered for address decoding)
+// parameter              DEC_WD      =  1;
+
+// // Register addresses offset
+// parameter [DEC_WD-1:0] DECODER_BUFFER      =  'h0,
+//                        ENCODER_BUFFER      =  'h1;
+
+
+// // Register one-hot decoder utilities
+// parameter              DEC_SZ      =  (1 << DEC_WD);              //size == 2
+// parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};   //base_reg == {01}
+
+// // Register one-hot decoder
+// parameter [DEC_SZ-1:0] DECODER_BUFFER_D  = (BASE_REG << CNTRL1),  //DECODER_BUFFER_D = 01cc << 0   [1:0]01cc 00
+//                        ENCODER_BUFFER_D  = (BASE_REG << CNTRL2);  //ENCODER_BUFFER_D = 01cc << 1   [1:0]01ce 10
+
+
+// //============================================================================
+// // 2)  REGISTER DECODER
+// //============================================================================
+
+// // Local register selection
+// wire              reg_sel      =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]); //per_addr[13:1] == BASE_ADDR[14:2]
+
+// // Register local address
+// wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};// reg_addr = {0,per_addr[0]}
+
+// // Register address decode
+// wire [DEC_SZ-1:0] reg_dec      = (DECODER_BUFFER_D  &  {DEC_SZ{(reg_addr==(DECODER_BUFFER >>1))}}) | //00
+//                                  (ENCODER_BUFFER_D  &  {DEC_SZ{(reg_addr==(ENCODER_BUFFER >>1))}}) ; //01
+
+// // Read/Write probes
+// wire              reg_lo_write =  per_we[0] & reg_sel;
+// wire              reg_hi_write =  per_we[1] & reg_sel;
+// wire              reg_read     = ~|per_we   & reg_sel;
+
+// // Read/Write vectors
+// wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
+// wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
+// wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
+
+// //============================================================================
+// // 3) REGISTERS
+// //============================================================================
+
+
+// // CNTRL1 Register
+// //-----------------
+
+// wire       cntrl1_wr  = CNTRL1[0] ? reg_hi_wr[CNTRL1] : reg_lo_wr[CNTRL1];
+// wire [7:0] cntrl1_nxt = CNTRL1[0] ? per_din[15:8]     : per_din[7:0];
+
+// always @ (posedge mclk or posedge puc_rst)
+//   if (puc_rst)        cntrl1 <=  8'h00;
+//   else if (cntrl1_wr) cntrl1 <=  cntrl1_nxt;
+
+
+
+// endmoudle //dma_tfbuffer.v
 
 
 
