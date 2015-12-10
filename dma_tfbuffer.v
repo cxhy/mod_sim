@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-19 15:21:53
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-09 17:32:03
+// $LastChangedDate:  2015-12-10 17:33:37
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_tfbuffer.v
@@ -48,13 +48,58 @@
 
 module dma_tfbuffer(
     //Inputs
-    ,
+    mclk,
+    puc_rst,
+    per_addr,
+    per_din,
+    per_en,
+    per_we,
+    encoder_buffer_din,
     //Outputs
-
+    decoder_buffer_dout,
+    code_ctrl,
+    per_dout
 );
 
-input         wire  ;
-output        reg   ;
+ input wire                     mclk;
+ input wire                     puc_rst;
+ input wire         [13:0]      per_addr;
+ input wire         [15:0]      per_din;
+ input wire                     per_en;
+ input wire         [1:0]       per_we;
+ input wire         [7:0]       encoder_buffer_din;
+ output reg         [7:0]       decoder_buffer_dout;
+ output reg         [7:0]       code_ctrl;
+ output reg         [15:0]      per_dout;
+
+ parameter BASE_ADDR = 15'h01aa;
+ parameter DEC_WD    = 3;
+ parameter [DEC_WD-1 :0] encoder_buffer_din     = 'h00,
+                         decoder_buffer_dout    = 'h02,
+                         code_ctrl              = 'h04;
+
+parameter                DEC_SZ  = (1 << DEC_WD);
+parameter [DEC_SZ-1:0]   DEC_REG = {{DEC_SZ-1{1'b0}},1'b1};
+
+parameter [DEC_SZ-1:0]   encoder_buffer_din_D  = (BASE_REG << encoder_buffer_din),
+                         decoder_buffer_dout_D = (BASE_REG << decoder_buffer_dout),
+                         code_ctrl_D           = (BASE_REG << code_ctrl);
+
+wire           reg_sel          = per_en & (per_addr [13:DEC_WD-1] == BASE_ADDR[14:DEC_WD]);
+wire      [DEC_WD-1:0] reg_addr = {1'b0,per_addr[DEC_WD-2:0]};
+wire      [DEC_SZ-1:0] reg_dec = (encoder_buffer_din_D    & {DEC_SZ{(reg_addr == ( encoder_buffer_din  >>1))}})|
+                                  (decoder_buffer_dout_D  & {DEC_SZ{(reg_addr == ( decoder_buffer_dout >>1))}})|
+                                  (code_ctrl_D            & {DEC_SZ{(reg_addr == ( code_ctrl           >>1))}});
+
+wire              reg_lo_write =  per_we[0] & reg_sel;
+wire              reg_hi_write =  per_we[1] & reg_sel;
+wire              reg_read     = ~|per_we   & reg_sel;
+
+wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
+wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
+wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
+
+//en_buffer_din
 
 endmoudle //dma_tfbuffer.v
 
