@@ -8,10 +8,10 @@ PORT(
 	puc_rst    : IN STD_LOGIC;
     --dma reg input
 	---------------------------------------------
-	dmax_ctl   : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	dmax_sa    : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	dmax_da    : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	dmax_sz    : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	dmax_ctl   : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	dmax_sa    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	dmax_da    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	dmax_sz    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 	dmax_tsel   : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
     ---------------------------------------------
 	trigger    : IN STD_LOGIC;
@@ -26,8 +26,8 @@ PORT(
 	dma_din   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     dma_we    : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
 
-	
-	
+
+
 );
 END ENTITY;
 
@@ -100,8 +100,8 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
        rdout_valid<='0';
    END IF;
 END IF;
-END PROCESS;		 
-		 	
+END PROCESS;
+
 PROCESS(mclk,puc_rst)
 BEGIN
 IF(puc_rst='1')THEN
@@ -119,9 +119,9 @@ IF(puc_rst='1')THEN
    state<=reset;
 ELSIF(mclk 'EVENT AND mclk='1')THEN
   CASE(state)IS
-  WHEN reset     => 
+  WHEN reset     =>
                    transfer_done<='0';
-  
+
   	               transfer_en<=dmax_ctl(4);
 	               T_size<=0;
 				   T_sourceADD<=(OTHERS=>'0');
@@ -135,20 +135,20 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
 				   read_done<='0';
 				   write_done<='0';
 				   dma_req<='0';
-				   
+
                    IF(transfer_en='1')THEN
 				      state<=load;
                    ELSE
 				      state<=reset;
 				   END IF;
-				   
+
   WHEN load      =>
                    T_size<= conv_integer(dmax_sz);
                    T_sourceADD<=dmax_sa;
                    T_destADD<=dmax_da;
-  
+
                    state<=idle;
-  
+
   WHEN idle      =>
                    dma_en<='0';
                    --dma_priority<='0';
@@ -158,23 +158,23 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
                    transfer_data<=(OTHERS=>'0');
                    read_done<='0';
 				   write_done<='0';
-  
+
                    IF(dma_abort='0')THEN
 				      state<=wft;
-				   ELSE 
+				   ELSE
 				      state<=idle;
 				   END IF;
 				   IF(transfer_en='0')THEN
 				      state<=reset;
 				   END IF;
-				   
+
   WHEN wft       =>
 --                   dma_req<=dmax_ctl(0);
                    IF(dmax_tsel="0000")THEN
                      dma_req<=trigger;
                    END IF;
 
- 
+
                    IF((trigger_pos='1' AND dma_level='0')OR(trigger='1' AND dma_level='1'))THEN
 				      state<=rd_mem;
 				   ELSE
@@ -184,7 +184,7 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
 				      state<=reset;
 				   END IF;
 
-  
+
   WHEN rd_mem    =>
 				   dma_en<='1';
 				   dma_we_r<="00";
@@ -194,33 +194,33 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
 				      transfer_data<=dma_dout;
 					  read_done<='1';
 				   END IF;
-				   
+
 				  IF(read_done='1')THEN
 				      state<=wr_mem;
 				   ELSE
 				      state<=rd_mem;
 				   END IF;
-  
+
   WHEN wr_mem    =>
                    read_done<='0';
-				   
+
                    dma_en<='1';
 				   dma_we_r<="11";
 --				   dma_priority<='0';
 				   dma_addr<=T_destADD(15 DOWNTO 1);
 				   dma_din<=transfer_data;
 				   write_done<='1';
-				   
+
                    IF(write_done='1')THEN
 				      IF(dma_ready='1')THEN------有可能这个周期写进去的数是无效的，所以还得继续在写状态下写数据，下一个周期再检测ready信号是否有效，有效才跳转
 					     state<=modify;
 					  ELSE
 					     state<=wr_mem;
 					  END IF;
-				   END IF;				   
-				   
-  
-  WHEN modify    =>  
+				   END IF;
+
+
+  WHEN modify    =>
                    write_done<='0';
 				   IF(dma_src_byte='1')THEN
 				      T_size<=T_size-1;
@@ -237,7 +237,7 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
 				   	  WHEN OTHERS => NULL;
 				      END CASE;
 				   END IF;
-				   
+
 				   IF(dma_dst_byte='1')THEN
 				      CASE(dma_dst_incr)IS
 				   	  WHEN "10" => T_destADD<=T_destADD-'1';
@@ -251,7 +251,7 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
                    	  WHEN OTHERS => NULL;
                       END CASE;
                    END IF;
-  
+
                    IF(dma_level='1' AND trigger='0')THEN
                       state<=idle;
 				   END IF;
@@ -264,33 +264,33 @@ ELSIF(mclk 'EVENT AND mclk='1')THEN
 				   IF(T_size>0 AND transfer_en='1')THEN
 				      state<=rst_req;
 				   END IF;
-				   
-  
+
+
   WHEN reload    =>
                   T_size<= conv_integer(dmax_sz);
                   T_sourceADD<=dmax_sa;
                   T_destADD<=dmax_da;
-  
+
                    state<=rst_req;
-  
+
   WHEN rst_req   =>
                    dma_req<='0';
-				   
+
                    state<=wft;
-  
+
   WHEN rst      =>
                   transfer_en<='0';
                   dma_req<='0';
                   T_size<= conv_integer(dmax_sz);
 
                   state<=reset;
-				  
+
 				  transfer_done<='1';
-  
+
   WHEN OTHERS    => NULL;
-  
+
   END CASE;
-  
+
   END IF;
 END PROCESS;
 

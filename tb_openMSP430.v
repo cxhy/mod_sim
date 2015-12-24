@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate:  2015-12-09 14:43:36
+// $LastChangedDate:  2015-12-17 14:28:46
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -208,6 +208,13 @@ integer            tb_idx;
 integer            tmp_seed;
 integer            error;
 reg                stimulus_done;
+
+//dma_tfbuffer
+
+wire    [7:0] encoder_buffer_din;
+wire    [7:0] decoder_buffer_dout;
+wire    [7:0] code_ctrl;
+wire    [15:0] per_dout_d2v;
 
 
 //
@@ -602,6 +609,7 @@ assign per_dout = per_dout_dio       |
                   per_dout_timerA    |
                   per_dout_temp_8b   |
                   per_dout_temp_16b  |
+                  per_dout_d2v       |
                   per_dout_dma       ;
 
 
@@ -638,6 +646,20 @@ assign wkup_in = wkup | {1'b0,                 // Vector 13  (0xFFFA)
                          1'b0,                 // Vector  2  (0xFFE4)
                          1'b0,                 // Vector  1  (0xFFE2)
                          1'b0};                // Vector  0  (0xFFE0)
+
+
+dma_tfbuffer dma_tfbuffer_u(
+    .mclk               (mclk),
+    .puc_rst            (puc_rst),
+    .per_addr           (per_addr),
+    .per_din            (per_din),
+    .per_en             (per_en),
+    .per_we             (per_we),
+    .encoder_buffer_din (encoder_buffer_din),
+    .decoder_buffer_dout(decoder_buffer_dout),
+    .code_ctrl          (code_ctrl),
+    .per_dout           (per_dout_d2v)
+    );
 
 
 //

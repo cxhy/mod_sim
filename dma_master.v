@@ -29,12 +29,12 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-11-30 16:26:44
+// $LastChangedDate:  2015-12-16 14:00:21
 //----------------------------------------------------------------------------
-// *File Name: dma_master.v 
-// 
+// *File Name: dma_master.v
+//
 // *Module Description:
-//                       DMAÖ÷»ú
+//                       DMAä¸»æœº
 //
 // *Author(s):
 //              - Guodezheng cxhy1981@gmail.com,
@@ -133,7 +133,7 @@ parameter [DEC_WD-1:0] DMACTL0      = 'h22,
                        DMA4CTL      = 'hD0,
                        DMA4SA       = 'hD2,
                        DMA4DA       = 'hD4,
-                       DMA4SZ       = 'hD6;                                              
+                       DMA4SZ       = 'hD6;
 
 // Register one-hot decoder utilities
 parameter              DEC_SZ      =  (1 << DEC_WD);
@@ -161,7 +161,7 @@ parameter [DEC_SZ-1:0] DMACTL0_D          = (BASE_REG << DMACTL0),
                        DMA4CTL_D          = (BASE_REG << DMA4CTL),
                        DMA4SA_D           = (BASE_REG << DMA4SA ),
                        DMA4DA_D           = (BASE_REG << DMA4DA ),
-                       DMA4SZ_D           = (BASE_REG << DMA4SZ ); 
+                       DMA4SZ_D           = (BASE_REG << DMA4SZ );
 
 //============================================================================
 // 2)  REGISTER DECODER
@@ -393,7 +393,7 @@ wire        dma3_da_wr = reg_wr[DMA3DA];
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        dma3_da <=  16'h0000;
   else if (dma3_da_wr) dma3_da <=  per_din;
-  
+
 
 // dma3sz Register
 //-----------------
@@ -404,7 +404,7 @@ wire        dma3_sz_wr = reg_wr[DMA3SZ];
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        dma3_sz <=  16'h0000;
   else if (dma3_sz_wr) dma3_sz <=  per_din;
-  
+
 
 // dma4ctl Register
 //-----------------
@@ -444,7 +444,7 @@ wire        dma4_sz_wr = reg_wr[DMA4SZ];
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        dma4_sz <=  16'h0000;
-  else if (dma4_sz_wr) dma4_sz <=  per_din;  
+  else if (dma4_sz_wr) dma4_sz <=  per_din;
 
 //============================================================================
 // 4) DATA OUTPUT GENERATION
@@ -501,7 +501,7 @@ wire [15:0] per_dout   =  dma_ctl0_rd   |
                           dma4_da_rd    |
                           dma4_sz_rd    ;
 
-//========================================================            
+//========================================================
 
 wire [3:0]                 dma0_tsel    ;
 wire [3:0]                 dma1_tsel    ;
@@ -509,41 +509,41 @@ wire [3:0]                 dma2_tsel    ;
 wire [3:0]                 dma3_tsel    ;
 wire [3:0]                 dma4_tsel    ;
 
-wire                       dma0_wkup     ;   
-wire                       dma0_en       ;   
-wire  [14:0]               dma0_addr     ;   
-wire  [15:0]               dma0_din      ;   
-wire  [1:0]                dma0_we       ;   
-wire                       dma0_priority ;   
+wire                       dma0_wkup     ;
+wire                       dma0_en       ;
+wire  [14:0]               dma0_addr     ;
+wire  [15:0]               dma0_din      ;
+wire  [1:0]                dma0_we       ;
+wire                       dma0_priority ;
 
 
-wire                       dma1_wkup     ;   
-wire                       dma1_en       ;   
-wire  [14:0]               dma1_addr     ;   
-wire  [15:0]               dma1_din      ;   
-wire  [1:0]                dma1_we       ;   
-wire                       dma1_priority ;   
+wire                       dma1_wkup     ;
+wire                       dma1_en       ;
+wire  [14:0]               dma1_addr     ;
+wire  [15:0]               dma1_din      ;
+wire  [1:0]                dma1_we       ;
+wire                       dma1_priority ;
 
-wire                       dma2_wkup     ;   
-wire                       dma2_en       ;   
-wire  [14:0]               dma2_addr     ;   
-wire  [15:0]               dma2_din      ;   
-wire  [1:0]                dma2_we       ;   
-wire                       dma2_priority ;   
+wire                       dma2_wkup     ;
+wire                       dma2_en       ;
+wire  [14:0]               dma2_addr     ;
+wire  [15:0]               dma2_din      ;
+wire  [1:0]                dma2_we       ;
+wire                       dma2_priority ;
 
-wire                       dma3_wkup     ;   
-wire                       dma3_en       ;   
-wire  [14:0]               dma3_addr     ;   
-wire  [15:0]               dma3_din      ;   
-wire  [1:0]                dma3_we       ;   
-wire                       dma3_priority ;   
+wire                       dma3_wkup     ;
+wire                       dma3_en       ;
+wire  [14:0]               dma3_addr     ;
+wire  [15:0]               dma3_din      ;
+wire  [1:0]                dma3_we       ;
+wire                       dma3_priority ;
 
-wire                       dma4_wkup     ;   
-wire                       dma4_en       ;   
-wire  [14:0]               dma4_addr     ;   
-wire  [15:0]               dma4_din      ;   
-wire  [1:0]                dma4_we       ;   
-wire                       dma4_priority ;   
+wire                       dma4_wkup     ;
+wire                       dma4_en       ;
+wire  [14:0]               dma4_addr     ;
+wire  [15:0]               dma4_din      ;
+wire  [1:0]                dma4_we       ;
+wire                       dma4_priority ;
 
 
 
@@ -582,14 +582,14 @@ dma_pri  dma_pri_u(
                        .dma4_ctl                  (dma4_ctl    ),
                        .dma4_sa                   (dma4_sa     ),
                        .dma4_da                   (dma4_da     ),
-                       .dma4_sz                   (dma4_sz     ),  
+                       .dma4_sz                   (dma4_sz     ),
 
                        .cha0_tf_done              (cha0_tf_done),
                        .cha1_tf_done              (cha1_tf_done),
                        .cha2_tf_done              (cha2_tf_done),
                        .cha3_tf_done              (cha3_tf_done),
                        .cha4_tf_done              (cha4_tf_done),
-                       
+
                        .dma_priority              (dma_priority),
                        .cha0_tri                  (cha0_tri    ),
                        .cha1_tri                  (cha1_tri    ),
@@ -601,7 +601,7 @@ dma_pri  dma_pri_u(
 // dma_priority dma_priority_u (
 //     .mclk                        (mclk),
 //     .puc_rst                     (puc_rst),
-    
+
 //     .dma_ctl0                    (dma_ctl0),
 //     .dma_ctl1                    (dma_ctl1),
 //     .dma0_ctl                    (dma0_ctl),
@@ -615,12 +615,12 @@ dma_pri  dma_pri_u(
 //     .dma2_ctl                    (dma2_ctl),
 //     .dma2_sa                     (dma2_sa),
 //     .dma2_da                     (dma2_da),
-//     .dma2_sz                     (dma2_sz),  
-    
+//     .dma2_sz                     (dma2_sz),
+
 //     .cha0_tf_done                (cha0_tf_done),
 //     .cha1_tf_done                (cha1_tf_done),
 //     .cha2_tf_done                (cha2_tf_done),
-    
+
 
 //     .dma_priority                (dma_priority),
 //     .cha0_tri                    (cha0_tri    ),
@@ -631,16 +631,16 @@ dma_pri  dma_pri_u(
 dma_channel dma_channel_u0(
     .mclk                        (mclk),
     .puc_rst                     (puc_rst),
-                                   
+
     .dmax_ctl                    (dma0_ctl),
-    .dmax_sa                     (dma0_sa), 
-    .dmax_da                     (dma0_da), 
-    .dmax_sz                     (dma0_sz), 
+    .dmax_sa                     (dma0_sa),
+    .dmax_da                     (dma0_da),
+    .dmax_sz                     (dma0_sz),
     .dmax_tsel                   (dma0_tsel),
-                                   
+
     .trigger                     (cha0_tri),
     .transfer_done               (cha0_tf_done),
-                                   
+
     .dma_ready                   (dma_ready),
     .dma_resp                    (dma_resp),
     .dma_dout                    (dma_dout),
@@ -655,19 +655,19 @@ dma_channel dma_channel_u0(
 dma_channel dma_channel_u1(
     .mclk                        (mclk),
     .puc_rst                     (puc_rst),
-                                   
+
     .dmax_ctl                    (dma1_ctl),
-    .dmax_sa                     (dma1_sa), 
-    .dmax_da                     (dma1_da), 
-    .dmax_sz                     (dma1_sz), 
+    .dmax_sa                     (dma1_sa),
+    .dmax_da                     (dma1_da),
+    .dmax_sz                     (dma1_sz),
     .dmax_tsel                   (dma1_tsel),
-                                   
+
     .trigger                     (cha1_tri),
     .transfer_done               (cha1_tf_done),
-                                   
+
     .dma_ready                   (dma_ready),
-    .dma_resp                    (dma_resp), 
-    .dma_dout                    (dma_dout), 
+    .dma_resp                    (dma_resp),
+    .dma_dout                    (dma_dout),
     .dma_wkup                    (dma1_wkup    ),
     .dma_en                      (dma1_en      ),
     .dma_addr                    (dma1_addr    ),
@@ -680,19 +680,19 @@ dma_channel dma_channel_u1(
 dma_channel dma_channel_u2(
     .mclk                        (mclk),
     .puc_rst                     (puc_rst),
-                                   
+
     .dmax_ctl                    (dma2_ctl),
-    .dmax_sa                     (dma2_sa), 
-    .dmax_da                     (dma2_da), 
-    .dmax_sz                     (dma2_sz), 
+    .dmax_sa                     (dma2_sa),
+    .dmax_da                     (dma2_da),
+    .dmax_sz                     (dma2_sz),
     .dmax_tsel                   (dma2_tsel),
-                                   
+
     .trigger                     (cha2_tri),
     .transfer_done               (cha2_tf_done),
-                                   
+
     .dma_ready                   (dma_ready),
-    .dma_resp                    (dma_resp), 
-    .dma_dout                    (dma_dout), 
+    .dma_resp                    (dma_resp),
+    .dma_dout                    (dma_dout),
     .dma_wkup                    (dma2_wkup    ),
     .dma_en                      (dma2_en      ),
     .dma_addr                    (dma2_addr    ),
@@ -704,19 +704,19 @@ dma_channel dma_channel_u2(
 dma_channel dma_channel_u3(
     .mclk                        (mclk),
     .puc_rst                     (puc_rst),
-                                   
+
     .dmax_ctl                    (dma3_ctl),
-    .dmax_sa                     (dma3_sa), 
-    .dmax_da                     (dma3_da), 
-    .dmax_sz                     (dma3_sz), 
+    .dmax_sa                     (dma3_sa),
+    .dmax_da                     (dma3_da),
+    .dmax_sz                     (dma3_sz),
     .dmax_tsel                   (dma3_tsel),
-                                   
+
     .trigger                     (cha3_tri),
     .transfer_done               (cha3_tf_done),
-                                   
+
     .dma_ready                   (dma_ready),
-    .dma_resp                    (dma_resp), 
-    .dma_dout                    (dma_dout), 
+    .dma_resp                    (dma_resp),
+    .dma_dout                    (dma_dout),
     .dma_wkup                    (dma3_wkup    ),
     .dma_en                      (dma3_en      ),
     .dma_addr                    (dma3_addr    ),
@@ -728,19 +728,19 @@ dma_channel dma_channel_u3(
 dma_channel dma_channel_u4(
     .mclk                        (mclk),
     .puc_rst                     (puc_rst),
-                                   
+
     .dmax_ctl                    (dma4_ctl),
-    .dmax_sa                     (dma4_sa), 
-    .dmax_da                     (dma4_da), 
-    .dmax_sz                     (dma4_sz), 
+    .dmax_sa                     (dma4_sa),
+    .dmax_da                     (dma4_da),
+    .dmax_sz                     (dma4_sz),
     .dmax_tsel                   (dma4_tsel),
-                                   
+
     .trigger                     (cha4_tri),
     .transfer_done               (cha4_tf_done),
-                                   
+
     .dma_ready                   (dma_ready),
-    .dma_resp                    (dma_resp), 
-    .dma_dout                    (dma_dout), 
+    .dma_resp                    (dma_resp),
+    .dma_dout                    (dma_dout),
     .dma_wkup                    (dma4_wkup    ),
     .dma_en                      (dma4_en      ),
     .dma_addr                    (dma4_addr    ),
@@ -749,11 +749,11 @@ dma_channel dma_channel_u4(
 //    .dma_priority                (dma2_priority)
 );
 
-assign dma_wkup       =   dma0_wkup | dma1_wkup | dma2_wkup | dma3_wkup | dma4_wkup ;  
-assign dma_en         =   dma0_en   | dma1_en   | dma2_en   | dma3_en   | dma4_en   ;  
-assign dma_addr       =   dma0_addr | dma1_addr | dma2_addr | dma3_addr | dma4_addr ;  
-assign dma_din        =   dma0_din  | dma1_din  | dma2_din  | dma3_din  | dma4_din  ;  
-assign dma_we         =   dma0_we   | dma1_we   | dma2_we   | dma3_we   | dma4_we   ;  
+assign dma_wkup       =   dma0_wkup | dma1_wkup | dma2_wkup | dma3_wkup | dma4_wkup ;
+assign dma_en         =   dma0_en   | dma1_en   | dma2_en   | dma3_en   | dma4_en   ;
+assign dma_addr       =   dma0_addr | dma1_addr | dma2_addr | dma3_addr | dma4_addr ;
+assign dma_din        =   dma0_din  | dma1_din  | dma2_din  | dma3_din  | dma4_din  ;
+assign dma_we         =   dma0_we   | dma1_we   | dma2_we   | dma3_we   | dma4_we   ;
 
 
 
