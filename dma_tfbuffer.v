@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-19 15:21:53
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-28 10:10:41
+// $LastChangedDate:  2015-12-28 10:31:15
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_tfbuffer.v
@@ -194,13 +194,27 @@ always @(posedge mclk or posedge puc_rst)
 
 assign code_ctrl = code_ctrl_reg ;
 
+//encoder_buffer_din
+wire [7:0] encoder_buffer_din_reg;
+omsp_sync_cell encoder_buffer_din_0 (.data_out(encoder_buffer_din_reg[0]), .data_in(encoder_buffer_din[0]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_1 (.data_out(encoder_buffer_din_reg[1]), .data_in(encoder_buffer_din[1]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_2 (.data_out(encoder_buffer_din_reg[2]), .data_in(encoder_buffer_din[2]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_3 (.data_out(encoder_buffer_din_reg[3]), .data_in(encoder_buffer_din[3]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_4 (.data_out(encoder_buffer_din_reg[4]), .data_in(encoder_buffer_din[4]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_5 (.data_out(encoder_buffer_din_reg[5]), .data_in(encoder_buffer_din[5]), .clk(mclk), .rst(puc_rst));
+omsp_sync_cell encoder_buffer_din_6 (.data_out(encoder_buffer_din_reg[6]), .data_in(encoder_buffer_din[6]), .clk(mclk), .rst(puc_rst));
 
 
-wire [15:0] decoder_reg_rd   = {8'h0, (decoder_reg         & {8{reg_rd[decoder_buffer_dout]}})} << (8 & {4{decoder_buffer_dout[0]}});
-wire [15:0] code_ctrl_reg_rd = {8'h0, (code_ctrl_reg       & {8{reg_rd[code_ctrl_reg]}})}       << (8 & {4{code_ctrl_reg[0]}});
 
-wire [15:0] per_dout  =  decoder_reg_rd |
-                         code_ctrl_reg ;
+
+wire [15:0] decoder_reg_rd            = {8'h0, (decoder_reg              & {8{reg_rd[decoder_buffer_dout]}})} << (8 & {4{decoder_buffer_dout[0]}});
+wire [15:0] code_ctrl_reg_rd          = {8'h0, (code_ctrl_reg            & {8{reg_rd[code_ctrl_reg      ]}})} << (8 & {4{code_ctrl_reg[0]      }});
+wire [15:0] encoder_buffer_din_reg_rd = {8'h00, (encoder_buffer_din_reg  & {8{reg_rd[ENCODER_BUFFERIN   ]}})} << (8 & {4{ENCODER_BUFFERIN[0]   }});
+
+
+wire [15:0] per_dout  =  decoder_reg_rd           |
+                         code_ctrl_reg            |
+                         encoder_buffer_din_reg_rd;
 
 //en_buffer_din
 endmodule  //dma_tfbuffer.v
