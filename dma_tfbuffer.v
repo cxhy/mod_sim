@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-19 15:21:53
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-24 23:13:15
+// $LastChangedDate:  2015-12-28 10:10:41
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_tfbuffer.v
@@ -114,10 +114,65 @@ wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
 wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
 
 //decoder_reg
-reg  [7:0] decoder_reg;
+//经典解码
+// reg  [7:0] decoder_reg;
 
-wire       decoder_reg_wr  = DECODER_BUFFEROUT[0] ? reg_hi_wr[DECODER_BUFFEROUT]   : reg_lo_wr[DECODER_BUFFEROUT];
-wire [7:0] decoder_reg_nxt = DECODER_BUFFEROUT[0] ? per_din[15:8]                  : per_din[7:0];
+// wire       decoder_reg_wr  = DECODER_BUFFEROUT[0] ? reg_hi_wr[DECODER_BUFFEROUT]   : reg_lo_wr[DECODER_BUFFEROUT];
+// wire [7:0] decoder_reg_nxt = DECODER_BUFFEROUT[0] ? per_din[15:8]                  : per_din[7:0];
+
+// // wire [7:0] decoder_reg_nxt_dly1 <= decoder_reg_nxt;
+// always @(posedge mclk or posedge puc_rst) begin
+// 	if (puc_rst)            decoder_reg <= 8'b0;
+// 	else if(decoder_reg_wr) decoder_reg <= decoder_reg_nxt;
+// end
+
+// assign decoder_buffer_dout = decoder_reg;
+//temp1
+// reg  [7:0] decoder_reg;
+
+// wire       decoder_reg_wr  = DECODER_BUFFEROUT[0] ? reg_hi_wr[DECODER_BUFFEROUT]   : reg_lo_wr[DECODER_BUFFEROUT];
+// reg  [2:0] cnt;
+// wire [7:0] decoder_reg_nxt;
+// reg  [7:0] decoder_reg_nxt_reg;
+
+
+// always @(posedge mclk or posedge puc_rst) begin
+// 	if (puc_rst) begin
+// 		// reset
+// 		decoder_reg_nxt_reg <= 8'b0;
+// 	end
+// 	else if(per_en) begin
+// 	    decoder_reg_nxt_reg  <= per_din[7:0];
+// 	end
+// end
+// assign decoder_reg_nxt = decoder_reg_nxt_reg;
+
+// always @(posedge mclk or posedge puc_rst) begin
+// 	if (puc_rst)            decoder_reg <= 8'b0;
+// 	else if(decoder_reg_wr) begin
+// 		decoder_reg <= decoder_reg_nxt;
+// 	end
+// end
+
+// assign decoder_buffer_dout = decoder_reg;
+
+//temp2
+reg   [7:0] decoder_reg;
+wire  [7:0] per_din_reg;
+reg   cnt;
+
+always @( reg_sel or posedge puc_rst) begin
+	if (puc_rst)         cnt <= 1'b1;
+	else if (reg_sel)    cnt <= cnt + 1;
+end
+
+// assign per_din_reg = per_din;
+assign per_din_reg = cnt ? per_din[15:8] : per_din[7:0];
+
+wire       decoder_reg_wr  = DECODER_BUFFEROUT[0] ? reg_hi_wr[DECODER_BUFFEROUT]       : reg_lo_wr[DECODER_BUFFEROUT];
+// wire [7:0] decoder_reg_nxt = DECODER_BUFFEROUT[0] ? per_din[15:8]                  : per_din[7:0];
+wire [7:0] decoder_reg_nxt = per_din_reg;
+
 // wire [7:0] decoder_reg_nxt_dly1 <= decoder_reg_nxt;
 always @(posedge mclk or posedge puc_rst) begin
 	if (puc_rst)            decoder_reg <= 8'b0;
@@ -130,7 +185,8 @@ assign decoder_buffer_dout = decoder_reg;
 reg  [7:0] code_ctrl_reg;
 
 wire       code_ctrl_reg_wr  = CODE_CTRLOUT[0] ? reg_hi_wr[CODE_CTRLOUT] : reg_lo_wr[CODE_CTRLOUT];
-wire [7:0] code_ctrl_reg_nxt = CODE_CTRLOUT[0]   ? per_din[15:8]                  : per_din[7:0];
+// wire [7:0] code_ctrl_reg_nxt = CODE_CTRLOUT[0]   ? per_din[15:8]                  : per_din[7:0];
+wire [7:0] code_ctrl_reg_nxt = per_din_reg;
 
 always @(posedge mclk or posedge puc_rst)
     if (puc_rst)                   code_ctrl_reg <= 8'h0;
