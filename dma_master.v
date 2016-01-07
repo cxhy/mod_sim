@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-06 11:57:15
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-16 14:00:21
+// $LastChangedDate:  2015-12-28 16:09:15
 //----------------------------------------------------------------------------
 // *File Name: dma_master.v
 //
@@ -55,6 +55,7 @@ module  dma_master (
     dma_we,                         // Direct Memory Access write byte enable (high active)
     dma_wkup,                       // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     nmi,                            // Non-maskable interrupt (asynchronous)
+    tansfer_end,
 
 // INPUTs
     mclk,                           // Main system clock
@@ -89,6 +90,7 @@ output              dma_priority;
 output       [1:0]  dma_we;
 output              dma_wkup;
 output              nmi;
+output              tansfer_end;
 // INPUTs
 //=========Peripheral part
 input               mclk;           // Main system clock
@@ -749,11 +751,15 @@ dma_channel dma_channel_u4(
 //    .dma_priority                (dma2_priority)
 );
 
-assign dma_wkup       =   dma0_wkup | dma1_wkup | dma2_wkup | dma3_wkup | dma4_wkup ;
-assign dma_en         =   dma0_en   | dma1_en   | dma2_en   | dma3_en   | dma4_en   ;
-assign dma_addr       =   dma0_addr | dma1_addr | dma2_addr | dma3_addr | dma4_addr ;
-assign dma_din        =   dma0_din  | dma1_din  | dma2_din  | dma3_din  | dma4_din  ;
-assign dma_we         =   dma0_we   | dma1_we   | dma2_we   | dma3_we   | dma4_we   ;
+assign dma_wkup       =   dma0_wkup  | dma1_wkup    | dma2_wkup    | dma3_wkup    | dma4_wkup   ;
+assign dma_en         =   dma0_en    | dma1_en      | dma2_en      | dma3_en      | dma4_en     ;
+assign dma_addr       =   dma0_addr  | dma1_addr    | dma2_addr    | dma3_addr    | dma4_addr   ;
+assign dma_din        =   dma0_din   | dma1_din     | dma2_din     | dma3_din     | dma4_din    ;
+assign dma_we         =   dma0_we    | dma1_we      | dma2_we      | dma3_we      | dma4_we     ;
+assign tansfer_end    = cha0_tf_done | cha1_tf_done | cha2_tf_done | cha3_tf_done | cha4_tf_done;
+
+
+
 
 
 
@@ -833,6 +839,7 @@ assign dma_we         =   dma0_we   | dma1_we   | dma2_we   | dma3_we   | dma4_w
 
 
 //======================================================== DMA_INTERFACE ==============================================//
+
 
 
 

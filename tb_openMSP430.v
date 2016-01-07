@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate:  2015-12-28 10:29:41
+// $LastChangedDate:  2015-12-28 14:51:23
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -216,7 +216,7 @@ wire    [7:0] decoder_buffer_dout;
 wire    [7:0] code_ctrl;
 wire    [15:0] per_dout_d2v;
 
-assign encoder_buffer_din = 8'b10101010;
+// assign encoder_buffer_din = 8'b10101010;
 
 
 //
