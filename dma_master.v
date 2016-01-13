@@ -30,7 +30,7 @@
 // *File Name: dma_master.v
 //
 // *Module Description:
-//                       dmaÖ÷»ú
+//                       dmaä¸»æœº
 //
 // *Author(s):
 //              - guodezheng,    cxhy1981@gmail.com
@@ -38,7 +38,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 134 $
 // $LastChangedBy: guodezheng $
-// $LastChangedDate: 2015/10/6 ÐÇÆÚ¶þ 12:02:45 $
+// $LastChangedDate: 2015/10/6 æ˜ŸæœŸäºŒ 12:02:45 $
 //----------------------------------------------------------------------------
 
 module  dma_master (
@@ -122,12 +122,12 @@ wire          [15:0] per_dout ;
 dma_decoder dma_decoder_u (
     .mclk              (mclk    ),
     .puc_rst           (puc_rst ),
-    
+
     .per_addr          (per_addr),
     .per_din           (per_din ),
     .per_en            (per_en  ),
     .per_we            (per_we  ),
-    
+
     .dma_ctl0          (dma_ctl0),
     .dma_ctl1          (dma_ctl1),
     .dma0_ctl          (dma0_ctl),

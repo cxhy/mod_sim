@@ -5,9 +5,10 @@ vlog -work work tb_openMSP430.v
 vlog -work work openMSP430.v
 
 
-vcom -work work dma_channel.vhd
+#vlog -work work dma_channel.v
 vlog -work work dma_priority.v
 vlog -work work dma_master.v
+vlog -work work dma_decoder.v
 
 vlog -work work io_cell.v
 vlog -work work msp_debug.v
