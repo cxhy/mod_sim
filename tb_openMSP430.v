@@ -1,4 +1,4 @@
-//----------------------------------------------------------------------------
+ //----------------------------------------------------------------------------
 // Copyright (C) 2001 Authors
 //
 // This source file may be used and distributed without restriction provided
@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate:  2015-12-28 14:51:23
+// $LastChangedDate: 2015-07-15 22:59:52 +0200 (Wed, 15 Jul 2015) $
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -80,6 +80,8 @@ wire               dma_priority;
 wire         [1:0] dma_we;
 wire               dma_wkup;
 
+
+
 // Digital I/O
 wire               irq_port1;
 wire               irq_port2;
@@ -109,9 +111,62 @@ reg          [7:0] p4_din;
 reg          [7:0] p5_din;
 reg          [7:0] p6_din;
 
+///dma reg
+wire         [15:0]dma_ctl0;
+wire         [15:0]dma_ctl1;
+wire         [15:0]dma0_ctl;
+wire         [15:0]dma0_sa;
+wire         [15:0]dma0_da;
+wire         [15:0]dma0_sz;
+wire         [15:0]dma1_ctl;
+wire         [15:0]dma1_sa;
+wire         [15:0]dma1_da;
+wire         [15:0]dma1_sz;
+wire         [15:0]dma2_ctl;
+wire         [15:0]dma2_sa;
+wire         [15:0]dma2_da;
+wire         [15:0]dma2_sz;
+
+///
+// wire               trigger;
+wire               trigger0;
+wire               trigger1;
+wire               trigger2;
+
+wire               code_sel_tri;
+
+wire    [15:0]  encoder_buffer_din;
+wire           encoder_buffer_din_en;
+wire    [15:0] decoder_buffer_dout;
+wire           decoder_buffer_dout_en;
+wire    [15:0]  code_ctrl;
+wire           code_ctrl_en;
+wire    [15:0] viterbi_long;
+wire    [15:0] per_dout_d2v;
+
+wire           viterbi_in_start;
+wire           viterbi_in_end;
+wire    [3:0]  viterbi_in_0;
+wire    [3:0]  viterbi_in_1;
+wire           viterbi_in_valid;
+wire           viterbi_out_begin;
+wire           viterbi_out;
+wire           viterbi_out_valid;
+wire           viterbi_out_end;
+
+wire           encode_start;
+wire           encode_end;
+wire           encode_in;
+wire           encode_in_en;
+wire           encode_out_begin;
+wire           encode_out_end;
+wire    [1:0]  encode_out;
+wire           encode_out_valid;
+
+
 // Peripheral templates
-wire        [15:0] per_dout_temp_8b;
 wire        [15:0] per_dout_temp_16b;
+wire        [15:0] per_dout_temp_8b;
 wire        [15:0] per_dout_dma;
 
 // Timer A
@@ -149,7 +204,7 @@ wire               smclk;
 wire               smclk_en;
 reg                reset_n;
 wire               puc_rst;
-wire               nmi;
+reg                nmi;
 reg  [`IRQ_NR-3:0] irq;
 wire [`IRQ_NR-3:0] irq_acc;
 wire [`IRQ_NR-3:0] irq_in;
@@ -208,15 +263,6 @@ integer            tb_idx;
 integer            tmp_seed;
 integer            error;
 reg                stimulus_done;
-
-//dma_tfbuffer
-
-wire    [7:0] encoder_buffer_din;
-wire    [7:0] decoder_buffer_dout;
-wire    [7:0] code_ctrl;
-wire    [15:0] per_dout_d2v;
-
-// assign encoder_buffer_din = 8'b10101010;
 
 
 //
@@ -296,14 +342,14 @@ initial
      error                   = 0;
      stimulus_done           = 1;
      irq                     = {`IRQ_NR-2{1'b0}};
-//     nmi                     = 1'b0;
-     wkup                    = 14'h0000;
-//     dma_addr                = 15'h0000;
-//     dma_din                 = 16'h0000;
-//     dma_en                  = 1'b0;
-//     dma_priority            = 1'b0;
-//     dma_we                  = 2'b00;
-//     dma_wkup                = 1'b0;
+     nmi                     = 1'b0;
+     // wkup                    = 14'h0000;
+     // dma_addr                = 15'h0000;
+     // dma_din                 = 16'h0000;
+     // dma_en                  = 1'b0;
+     // dma_priority            = 1'b0;
+     // dma_we                  = 2'b00;
+     // dma_wkup                = 1'b0;
      // dma_tfx_cancel          = 1'b0;
      cpu_en                  = 1'b1;
      dbg_en                  = 1'b0;
@@ -328,7 +374,7 @@ initial
      p3_din                  = 8'h00;
      p4_din                  = 8'h00;
      p5_din                  = 8'h00;
-     p6_din                  = 8'haa;
+     p6_din                  = 8'h00;
      inclk                   = 1'b0;
      taclk                   = 1'b0;
      ta_cci0a                = 1'b0;
@@ -556,13 +602,10 @@ template_periph_8b template_periph_8b_0 (
     .puc_rst           (puc_rst)               // Main system reset
 );
 
-`ifdef CVER
-template_periph_16b #(15'h0190)                                        template_periph_16b_0 (
-`else
-template_periph_16b  template_periph_16b_0 (
-`endif
+template_periph_16b template_periph_16b_0 (
+
 // OUTPUTs
-    .per_dout          (per_dout_temp_16b),    // Peripheral data output
+    .per_dout          (per_dout_temp_16b),     // Peripheral data output
 
 // INPUTs
     .mclk              (mclk),                 // Main system clock
@@ -572,37 +615,6 @@ template_periph_16b  template_periph_16b_0 (
     .per_we            (per_we),               // Peripheral write enable (high active)
     .puc_rst           (puc_rst)               // Main system reset
 );
-
-
-dma_master dma_master_0(
-     // OUTPUTs
-    .per_dout         (per_dout_dma),              // Peripheral data output
-
-    .dma_addr         (dma_addr),              // Direct Memory Access address
-    .dma_din          (dma_din),               // Direct Memory Access data input
-    .dma_en           (dma_en),                // Direct Memory Access enable (high active)
-    .dma_priority     (dma_priority),          // Direct Memory Access priority (0:low / 1:high)
-    .dma_we           (dma_we),                // Direct Memory Access write byte enable (high active)
-    .dma_wkup         (dma_wkup),              // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
-    .nmi              (nmi),                   // Non-maskable interrupt (asynchronous)
-
-      // INPUTs       (),
-    .mclk             (mclk),                  // Main system clock
-    .per_addr         (per_addr),              // Peripheral address
-    .per_din          (per_din),               // Peripheral data input
-    .per_en           (per_en),                // Peripheral enable (high active)
-    .per_we           (per_we),                // Peripheral write enable (high active)
-    .puc_rst          (puc_rst),               // Main system reset
-
-   .dma_dout         (dma_dout),              // Direct Memory Access data output
-   .dma_ready        (dma_ready),             // Direct Memory Access is complete
-   .dma_resp         (dma_resp)               // Direct Memory Access response (0:Okay / 1:Error)
-
-
-
-);
-
-
 //
 // Combine peripheral data bus
 //----------------------------------
@@ -610,9 +622,9 @@ dma_master dma_master_0(
 assign per_dout = per_dout_dio       |
                   per_dout_timerA    |
                   per_dout_temp_8b   |
-                  per_dout_temp_16b  |
-                  per_dout_d2v       |
-                  per_dout_dma       ;
+				  per_dout_temp_16b  |
+				  per_dout_d2v       |
+                  per_dout_dma;
 
 
 //
@@ -648,20 +660,6 @@ assign wkup_in = wkup | {1'b0,                 // Vector 13  (0xFFFA)
                          1'b0,                 // Vector  2  (0xFFE4)
                          1'b0,                 // Vector  1  (0xFFE2)
                          1'b0};                // Vector  0  (0xFFE0)
-
-
-dma_tfbuffer dma_tfbuffer_u(
-    .mclk               (mclk),
-    .puc_rst            (puc_rst),
-    .per_addr           (per_addr),
-    .per_din            (per_din),
-    .per_en             (per_en),
-    .per_we             (per_we),
-    .encoder_buffer_din (encoder_buffer_din),
-    .decoder_buffer_dout(decoder_buffer_dout),
-    .code_ctrl          (code_ctrl),
-    .per_dout           (per_dout_d2v)
-    );
 
 
 //
@@ -726,125 +724,134 @@ msp_debug msp_debug_0 (
 );
 
 
+
+/////////////////dma_master///////////////////////
+
+dma_master u_dma_master(
+		.mclk       (mclk),
+		.puc_rst    (puc_rst),
+		.dma_ready  (dma_ready),
+		.dma_resp   (dma_resp),
+		.dma_dout   (dma_dout),
+		
+		.per_addr   (per_addr),             // Peripheral address
+        .per_din    (per_din),              // Peripheral data input
+		.per_en     (per_en),               // Peripheral enable (high active)///
+		.per_we     (per_we),               // Peripheral write enable (high active)
+		.code_sel_tri (code_sel_tri),
+		
+		.per_dout   (per_dout_dma),    // Peripheral data output
+		.trigger0   (trigger0),
+		.trigger1   (trigger1),
+		.trigger2   (trigger2),
+		
+		.dma_wkup   (dma_wkup),
+		.dma_addr   (dma_addr),
+		.dma_din    (dma_din),
+		.dma_en     (dma_en),
+		.dma_we     (dma_we),
+		.dma_priority (dma_priority)		
+);
+
+dma_tfbuffer dma_tfbuffer_u(
+    .mclk                   (mclk),
+    .puc_rst                (puc_rst),
+    .per_addr               (per_addr),
+    .per_din                (per_din),
+    .per_en                 (per_en),
+    .per_we                 (per_we),
+    .encoder_buffer_din     (encoder_buffer_din),
+	.encoder_buffer_din_en  (encoder_buffer_din_en),
+    .decoder_buffer_dout    (decoder_buffer_dout),
+	.decoder_buffer_dout_en (decoder_buffer_dout_en),
+    .code_ctrl              (code_ctrl),
+	.code_ctrl_en           (code_ctrl_en),
+	.viterbi_long           (viterbi_long),
+    .per_dout               (per_dout_d2v)
+    );
+
+	
+	
+
+fifo_ctl_in fifo_ctl_0(                     //////code输入控制型fifo
+   .clk                   (mclk),
+   .rst                   (~puc_rst),
+   .per_decode_in         (decoder_buffer_dout),
+   .per_decode_in_valid   (decoder_buffer_dout_en),
+   .code_ctrl             (code_ctrl),
+   .code_ctrl_en          (code_ctrl_en),
+   .trigger               (trigger0),
+   .transfer_long         (viterbi_long),
+   
+   .fifo_0_out0_begin     (viterbi_in_start),
+   .fifo_0_out0_end       (viterbi_in_end),
+   .fifo_0_out0_0         (viterbi_in_0),
+   .fifo_0_out0_1         (viterbi_in_1),
+   .fifo_0_out0_valid     (viterbi_in_valid),
+   
+   .fifo_0_out1_begin     (encode_start),
+   .fifo_0_out1_end       (encode_end),
+   .fifo_0_out1           (encode_in),
+   .fifo_0_out1_en        (encode_in_en)
+   );	
+
+   
+fifo_ctl_out fifo_ctl_1(                  //////code输出控制型fifo
+   .clk                   (mclk),
+   .rst                   (~puc_rst),
+   .code_ctrl             (code_ctrl),
+   .code_ctrl_en          (code_ctrl_en),
+   .viterbi_out_begin     (viterbi_out_begin),
+   .viterbi_out_end       (viterbi_out_end),
+   .encode_out_begin      (encode_out_begin),
+   .encode_out_end        (encode_out_end),
+   
+   .viterbi_out           (viterbi_out),
+   .viterbi_out_valid     (viterbi_out_valid),
+   .encode_out            (encode_out),
+   .encode_out_valid      (encode_out_valid),
+   .trigger0              (trigger0),
+   .trigger1              (trigger1),
+   
+   .code_sel_tri          (code_sel_tri),   
+   .fifo_1_out            (encoder_buffer_din),
+   .fifo_1_out_valid      (encoder_buffer_din_en)
+   );
+	
+
+viterbi_top u_viterbi(
+   .clk                 (mclk),
+   .rst                 (~puc_rst),
+   .viterbi_in_start    (viterbi_in_start),
+   .viterbi_in_end      (viterbi_in_end),
+   .viterbi_in_0        (viterbi_in_0),
+   .viterbi_in_1        (viterbi_in_1),
+   .viterbi_in_valid    (viterbi_in_valid),
+   
+   .viterbi_out_begin   (viterbi_out_begin),
+   .viterbi_out         (viterbi_out),
+   .viterbi_out_valid   (viterbi_out_valid),
+   .viterbi_out_end     (viterbi_out_end)
+   );
+
+conv_encode7 u_conv_encode7(
+   .clk                 (mclk),
+   .rst                 (~puc_rst),
+   .encode_start        (encode_start),
+   .encode_end          (encode_end),
+   .encode_in           (encode_in),
+   .encode_in_en        (encode_in_en),
+   .encode_out_begin    (encode_out_begin),
+   .encode_out          (encode_out),
+   .encode_out_valid    (encode_out_valid),
+   .encode_out_end      (encode_out_end)
+   );
+	
+////////////////////////////////////////////////////
 //
 // Generate Waveform
 //----------------------------------------
-initial
-  begin
-   `ifdef NODUMP
-   `else
-     `ifdef VPD_FILE
-        $vcdplusfile("tb_openMSP430.vpd");
-        $vcdpluson();
-     `else
-       `ifdef TRN_FILE
-          $recordfile ("tb_openMSP430.trn");
-          $recordvars;
-       `else
-          $dumpfile("tb_openMSP430.vcd");
-          $dumpvars(0, tb_openMSP430);
-       `endif
-     `endif
-   `endif
-  end
-
-//
-// End of simulation
-//----------------------------------------
-
-// initial // Timeout
-  // begin
-   // `ifdef NO_TIMEOUT
-   // `else
-     // `ifdef VERY_LONG_TIMEOUT
-       // #500000000;
-     // `else
-     // `ifdef LONG_TIMEOUT
-       // #5000000;
-     // `else
-       // #500000;
-     // `endif
-     // `endif
-       // $display(" ===============================================");
-       // $display("|               SIMULATION FAILED               |");
-       // $display("|              (simulation Timeout)             |");
-       // $display(" ===============================================");
-       // $display("");
-       // tb_extra_report;
-       // $finish;
-   // `endif
-  // end
-
-// initial // Normal end of test
-  // begin
-     // @(negedge stimulus_done);
-     // wait(inst_pc=='hffff);
-
-     // $display(" ===============================================");
-     // if ((dma_rd_error!=0) || (dma_wr_error!=0))
-       // begin
-          // $display("|               SIMULATION FAILED               |");
-          // $display("|           (some DMA transfer failed)          |");
-       // end
-     // else if (error!=0)
-       // begin
-          // $display("|               SIMULATION FAILED               |");
-          // $display("|     (some verilog stimulus checks failed)     |");
-       // end
-     // else if (~stimulus_done)
-       // begin
-          // $display("|               SIMULATION FAILED               |");
-          // $display("|     (the verilog stimulus didn't complete)    |");
-       // end
-     // else
-       // begin
-          // $display("|               SIMULATION PASSED               |");
-       // end
-     // $display(" ===============================================");
-     // $display("");
-     // tb_extra_report;
-     // $finish;
-  // end
 
 
-//
-// Tasks Definition
-//------------------------------
-
-   // task tb_error;
-      // input [65*8:0] error_string;
-      // begin
-         // $display("ERROR: %s %t", error_string, $time);
-         // error = error+1;
-      // end
-   // endtask
-
-   // task tb_extra_report;
-      // begin
-         // $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
-         // $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
-         // if (!((`PMEM_SIZE>=4092) && (`DMEM_SIZE>=1024)))
-           // begin
-	      // $display("");
-              // $display("Note: DMA if verification disabled (PMEM must be 4kB or bigger, DMEM must be 1kB or bigger)");
-           // end
-         // $display("");
-         // $display("SIMULATION SEED: %d", `SEED);
-         // $display("");
-      // end
-   // endtask
-
-   // task tb_skip_finish;
-      // input [65*8-1:0] skip_string;
-      // begin
-         // $display(" ===============================================");
-         // $display("|               SIMULATION SKIPPED              |");
-         // $display("%s", skip_string);
-         // $display(" ===============================================");
-         // $display("");
-         // tb_extra_report;
-         // $finish;
-      // end
-   // endtask
 
 endmodule

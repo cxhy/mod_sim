@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2009 , Guo Dezheng
+// Copyright (C) 2009 , Olivier Girard
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -26,22 +26,24 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// $Rev:  $
-// $CreatDate:   2015-11-06 11:57:15
-// $LastChangedBy: guodezheng $
-// $LastChangedDate:  2015-12-07 17:34:07
-//----------------------------------------------------------------------------
 //
-// *File Name: dma_pri.v 
-// 
+// *File Name: dma_master.v
+//
 // *Module Description:
-//                       ÓÅÏÈ¼¶¿ØÖÆÄ£¿é£¬ÏòÏÂ²ãÌá¹©µ±Ç°¼¤»îµÄÍ¨µÀ£¬Ìá¹©Í¨µÀ´«Êä´¥·¢ĞÅºÅ
-//                       ½ÓÊÜÀ´×ÔÍ¨µÀµÄ´«ÊäÍê³ÉĞÅºÅ²¢½øĞĞÍ¨µÀÓÅÏÈ¼¶µÄ¿ØÖÆĞÅÏ¢µÄ´¦Àí¡£
+//                       dmaä¸»æœº
 //
 // *Author(s):
-//              - Guodezheng cxhy1981@gmail.com,
+//              - guodezheng,    cxhy1981@gmail.com
 //
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
+// $Rev: 134 $
+// $LastChangedBy: guodezheng $
+// $LastChangedDate: 2015/10/6 æ˜ŸæœŸäºŒ 12:02:45 $
+// åŠ å…¥äº†ç»“æŸåˆ¤æ–­ä½çš„èµ·å§‹ä¿¡å·å’Œç»“æŸä¿¡å·ï¼Œé€ç»™decoderæ¨¡å—ç”¨äºç”Ÿæˆdmaen_doneä¿¡å·ç”¨äºå†™å…¥å†…å­˜
+// updata : 2016/01/21 ä¸ºdmaxreqä¿¡å·æ·»åŠ ä½¿èƒ½ä¿¡å·(dmaxreq_en)å½“ä½¿èƒ½ä½ä¸ºé«˜ç›´åˆ°ï¼Œdmaxreqä¼šæ¥å—æ¥è‡ªdmaxctl0[0]çš„é…ç½®å¦åˆ™ä¸º0
+//                     æ¯å‘ç”Ÿä¸€æ¬¡dmax_ctlè¯»æ“ä½œçš„æ—¶å€™dmax_ctl_enä¼šè¢«è·å¾—ä¸€ä¸ªä¸Šå‡æ²¿è„‰å†²ã€‚å½“è¯»æ“ä½œç»“æŸä»¥åä¼šæ”¶åˆ°ä¸€ä¸ªæ¥è‡ªcha0_tf_doneä¿¡å·çš„ä¸Šå‡æ²¿è„‰å†²
+//                     åœ¨dmax_ctl_enä¿¡å·å‡ºç°ä¹‹åï¼Œdmaxreq_enä¿¡å·è¢«æ‹‰é«˜ï¼Œç›´åˆ°æ¥æ”¶åˆ°chax_tf_doneä¿¡å·ï¼Œä¿¡å·è¢«æ‹‰ä½ã€‚
+//----------------------------------------------------------------------------
 
 module  dma_pri (
                        mclk                      ,
@@ -50,120 +52,88 @@ module  dma_pri (
                        dma_ctl0                  ,
                        dma_ctl1                  ,
                        dma0_ctl                  ,
-                       dma0_sa                   ,
-                       dma0_da                   ,
-                       dma0_sz                   ,
+					             dma0_ctl_en               ,
                        dma1_ctl                  ,
-                       dma1_sa                   ,
-                       dma1_da                   ,
-                       dma1_sz                   ,
+					             dma1_ctl_en               ,
                        dma2_ctl                  ,
-                       dma2_sa                   ,
-                       dma2_da                   ,
-                       dma2_sz                   ,
-                       dma3_ctl                  ,
-                       dma3_sa                   ,
-                       dma3_da                   ,
-                       dma3_sz                   ,
-                       dma4_ctl                  ,
-                       dma4_sa                   ,
-                       dma4_da                   ,
-                       dma4_sz                   ,                                              
+					             dma2_ctl_en               ,
+
                        cha0_tf_done              ,
                        cha1_tf_done              ,
                        cha2_tf_done              ,
-                       cha3_tf_done              ,
-                       cha4_tf_done              ,
 
                        dma_priority              ,
                        cha0_tri                  ,
                        cha1_tri                  ,
-                       cha2_tri                  ,
-                       cha3_tri                  ,
-                       cha4_tri                  
+                       cha2_tri
+
 );
 
-input                                   mclk     ;
-input                                   puc_rst  ;
+input                                   mclk           ;
+input                                   puc_rst        ;
 
-input  [15:0]                           dma_ctl0 ;
-input  [15:0]                           dma_ctl1 ;
-input  [15:0]                           dma0_ctl ;
-input  [15:0]                           dma0_sa  ;
-input  [15:0]                           dma0_da  ;
-input  [15:0]                           dma0_sz  ;
-input  [15:0]                           dma1_ctl ;
-input  [15:0]                           dma1_sa  ;
-input  [15:0]                           dma1_da  ;
-input  [15:0]                           dma1_sz  ;
-input  [15:0]                           dma2_ctl ;
-input  [15:0]                           dma2_sa  ;
-input  [15:0]                           dma2_da  ;
-input  [15:0]                           dma2_sz  ;
-input  [15:0]                           dma3_ctl ;
-input  [15:0]                           dma3_sa  ;
-input  [15:0]                           dma3_da  ;
-input  [15:0]                           dma3_sz  ;
-input  [15:0]                           dma4_ctl ;
-input  [15:0]                           dma4_sa  ;
-input  [15:0]                           dma4_da  ;
-input  [15:0]                           dma4_sz  ;
-input                                   cha0_tf_done;
-input                                   cha1_tf_done;
-input                                   cha2_tf_done;
-input                                   cha3_tf_done;
-input                                   cha4_tf_done;
+input  [15:0]                           dma_ctl0       ;
+input  [15:0]                           dma_ctl1       ;
+input  [15:0]                           dma0_ctl       ;
+input                                   dma0_ctl_en    ;
+input  [15:0]                           dma1_ctl       ;
+input                                   dma1_ctl_en    ;
+input  [15:0]                           dma2_ctl       ;
+input                                   dma2_ctl_en    ;
+input                                   cha0_tf_done   ;
+input                                   cha1_tf_done   ;
+input                                   cha2_tf_done   ;
 
-output                                  dma_priority;
-output                                  cha0_tri ;
-output                                  cha1_tri ;
-output                                  cha2_tri ;
-output                                  cha3_tri ;
-output                                  cha4_tri ;
+output                                  dma_priority   ;
+output                                  cha0_tri       ;
+output                                  cha1_tri       ;
+output                                  cha2_tri       ;
 
 
 
-wire  [15:0]                           dma_ctl0 ;
-wire  [15:0]                           dma_ctl1 ;
-wire  [15:0]                           dma0_ctl ;
-wire  [15:0]                           dma0_sa  ;
-wire  [15:0]                           dma0_da  ;
-wire  [15:0]                           dma0_sz  ;
-wire  [15:0]                           dma1_ctl ;
-wire  [15:0]                           dma1_sa  ;
-wire  [15:0]                           dma1_da  ;
-wire  [15:0]                           dma1_sz  ;
-wire  [15:0]                           dma2_ctl ;
-wire  [15:0]                           dma2_sa  ;
-wire  [15:0]                           dma2_da  ;
-wire  [15:0]                           dma2_sz  ;
-wire  [15:0]                           dma3_ctl ;
-wire  [15:0]                           dma3_sa  ;
-wire  [15:0]                           dma3_da  ;
-wire  [15:0]                           dma3_sz  ;
-wire  [15:0]                           dma4_ctl ;
-wire  [15:0]                           dma4_sa  ;
-wire  [15:0]                           dma4_da  ;
-wire  [15:0]                           dma4_sz  ;
-wire  [3:0]                            DMA0TSELx;
-wire  [3:0]                            DMA1TSELx;
-wire  [3:0]                            DMA2TSELx;
-wire  [3:0]                            DMA3TSELx;
-wire  [3:0]                            DMA4TSELx;
+wire  [15:0]                           dma_ctl0        ;
+wire  [15:0]                           dma_ctl1        ;
+wire  [15:0]                           dma0_ctl        ;
+wire  [15:0]                           dma1_ctl        ;
+wire  [15:0]                           dma2_ctl        ;
+wire  [3:0]                            DMA0TSELx       ;
+wire  [3:0]                            DMA1TSELx       ;
+wire  [3:0]                            DMA2TSELx       ;
+wire                                   dma0_ctl_en     ;
+wire                                   dma1_ctl_en     ;
+wire                                   dma2_ctl_en     ;
+wire                                   cha0_tf_done    ;
+wire                                   cha1_tf_done    ;
+wire                                   cha2_tf_done    ;
+
+wire                                   cha_tri         ;
+reg                                    cha_tri_dly     ;
+wire                                   cha_tri_pos     ;
+wire                                   cha_tf_done     ;
+reg                                    cha_tf_done_dly ;
+wire                                   cha_tf_done_pos ;
+wire                                   dma0req_en      ;
+wire                                   dma1req_en      ;
+wire                                   dma2req_en      ;
+reg                                    dma0req_en_reg  ;
+reg                                    dma1req_en_reg  ;
+reg                                    dma2req_en_reg  ;
 
 
-reg                                    cha0_tri ;
-reg                                    cha1_tri ;
-reg                                    cha2_tri ;
-reg                                    cha3_tri ;
-reg                                    cha4_tri ;
-reg                                    dma0_tri ;
-reg                                    dma1_tri ;
-reg                                    dma2_tri ;
-reg                                    dma3_tri ;
-reg                                    dma4_tri ;
-reg [4:0]                              last_txf_cha;
+reg                                    cha0_tri        ;
+reg                                    cha1_tri        ;
+reg                                    cha2_tri        ;
 
+reg                                    dma0_tri        ;
+reg                                    dma1_tri        ;
+reg                                    dma2_tri        ;
+reg [2:0]                              last_txf_cha    ;
+
+//  last_txf_cha      è¯´æ˜
+//  000               å¤ä½ä¹‹åè¿›è¡Œç¬¬ä¸€æ¬¡ä¼ è¾“
+//  001               ä¸Šä¸€æ¬¡ä¼ è¾“çš„æ˜¯é€šé“0
+//  010               ä¸Šä¸€æ¬¡ä¼ è¾“çš„æ˜¯é€šé“1
+//  100               ä¸Šä¸€æ¬¡ä¼ è¾“çš„æ˜¯é€šé“2
 
 
 
@@ -171,53 +141,138 @@ wire                                   ROUNDROBIN   ;
 wire                                   DMAONFETCH   ;
 
 
-parameter IDLE       = 6'b00_0001;   //01
-parameter CHA0       = 6'b00_0010;   //02
-parameter CHA1       = 6'b00_0100;   //04
-parameter CHA2       = 6'b00_1000;   //08
-parameter CHA3       = 6'b01_0000;   //10
-parameter CHA4       = 6'b10_0000;   //20
-reg       [5:0]      current_state;
-reg       [5:0]      next_state   ;
+parameter IDLE       = 4'b0001;
+parameter CHA0       = 4'b0010;
+parameter CHA1       = 4'b0100;
+parameter CHA2       = 4'b1000;
+reg       [3:0]      current_state;
+reg       [3:0]      next_state   ;
 
 assign     DMA0TSELx = dma_ctl0[3:0];
 assign     DMA1TSELx = dma_ctl0[7:4];
 assign     DMA2TSELx = dma_ctl0[11:8];
-assign     DMA3TSELx = dma_ctl0[15:12];
-assign     DMA4TSELx = dma_ctl1[7:4];
 
-assign     dma0req   = dma0_ctl[0];
-assign     dma1req   = dma1_ctl[0];
-assign     dma2req   = dma2_ctl[0];
-assign     dma3req   = dma3_ctl[0];
-assign     dma4req   = dma4_ctl[0];
+//dma0reqè‡ªåŠ¨å¤ä½æ¨¡å—
+// assign     dma0req   = dma0_ctl[0];
+// assign     dma1req   = dma1_ctl[0];
+// assign     dma2req   = dma2_ctl[0];
+assign     dma0req   = (dma0req_en) ?  dma0_ctl[0] : 1'b0;
+assign     dma1req   = (dma1req_en) ?  dma1_ctl[0] : 1'b0;
+assign     dma2req   = (dma2req_en) ?  dma2_ctl[0] : 1'b0;
+
+always @(posedge mclk or posedge puc_rst) begin
+    if(puc_rst) dma0req_en_reg <= 0;
+    else begin
+        if(dma0_ctl_en)        dma0req_en_reg <= 1'b1;
+        else if(cha0_tf_done)  dma0req_en_reg <= 1'b0;
+    end
+end
+
+always @(posedge mclk or posedge puc_rst) begin
+    if(puc_rst) dma1req_en_reg <= 0;
+    else begin
+        if(dma1_ctl_en)        dma1req_en_reg <= 1'b1;
+        else if(cha1_tf_done)  dma1req_en_reg <= 1'b0;
+    end
+end
+
+always @(posedge mclk or posedge puc_rst) begin
+    if(puc_rst) dma2req_en_reg <= 0;
+    else begin
+        if(dma2_ctl_en)        dma2req_en_reg <= 1'b1;
+        else if(cha2_tf_done)  dma2req_en_reg <= 1'b0;
+    end
+end
+
+assign dma0req_en = dma0req_en_reg;
+assign dma1req_en = dma1req_en_reg;
+assign dma2req_en = dma2req_en_reg;
+//dma0reqè‡ªåŠ¨å¤ä½æ¨¡å—
+
+//ä¸ºtf_doneä¿¡å·æ·»åŠ tf_done_syæ ‡å¿—ä½ï¼Œä½¿å¾—ä¸€ä¸ªé€šé“åœ¨ä¿¡å·ä¼ è¾“ç»“æŸä»¥åæŠŠdoneä¿¡å·è½¬æ¢ä¸ºæŒç»­çš„ç”µå¹³ä¿¡å·
+reg cha0_tf_done_sy;
+reg cha1_tf_done_sy;
+reg cha2_tf_done_sy;
+always @(posedge mclk or posedge puc_rst) begin
+  if(puc_rst)   cha0_tf_done_sy <= 0;
+  else begin
+      if(cha0_tf_done)       cha0_tf_done_sy <= 1'b1;
+      else if(cha0_tri)      cha0_tf_done_sy <= 1'b0;
+  end
+end
+
+always @(posedge mclk or posedge puc_rst) begin
+  if(puc_rst)   cha1_tf_done_sy <= 0;
+  else begin
+      if(cha1_tf_done)       cha1_tf_done_sy <= 1'b1;
+      else if(cha1_tri)      cha1_tf_done_sy <= 1'b0;
+  end
+end
+
+always @(posedge mclk or posedge puc_rst) begin
+  if(puc_rst)   cha2_tf_done_sy <= 0;
+  else begin
+      if(cha2_tf_done)       cha2_tf_done_sy <= 1'b1;
+      else if(cha2_tri)      cha2_tf_done_sy <= 1'b0;
+  end
+end
+
+
+
 
 assign     ROUNDROBIN = dma_ctl1[1];
 assign     DMAONFETCH = dma_ctl1[2];
 assign     dma_priority = DMAONFETCH;
 
+assign cha_tf_done = cha0_tf_done |
+                     cha1_tf_done |
+                     cha2_tf_done ;
+assign cha_tri     = cha0_tri     |
+                     cha1_tri     |
+                     cha2_tri     ;
+always @(posedge mclk or posedge puc_rst) begin
+    if (puc_rst) begin
+        // reset
+        cha_tri_dly     <= 1'b0;
+        cha_tf_done_dly <= 1'b0;
+    end
+    else begin
+        cha_tri_dly     <= cha_tri;
+        cha_tf_done_dly <= cha_tf_done;
+    end
+end
+assign cha_tri_pos     = cha_tri      & (~cha_tri_dly);
+assign cha_tf_done_pos = cha_tf_done  & (~cha_tf_done_dly);
+
+reg     tf_done_reg ;
+always @(posedge mclk or posedge puc_rst)begin
+    if(puc_rst == 1'b1)begin
+        tf_done_reg <= 1'b0;
+    end
+    else begin
+        if (cha_tf_done_pos == 1'b1) begin
+            tf_done_reg <= 1'b1;
+        end
+        if (cha_tri_pos == 1'b1)begin
+            tf_done_reg <= 1'b0;
+        end
+    end
+end
+
+// always @(posedge mclk or posedge puc_rst)begin
+//     if(puc_rst == 1'b1)begin
+//         tf_done_reg <= 1'b0;
+//     end
+//     else begin
+//        if (cha_tf_done_pos | cha_tri_pos )  tf_done_reg <= ~tf_done_reg;
+//     end
+// end
 
 
 
-//dmax_tri  À´×Ô´¥·¢Ô´µÄÍ¨µÀ´¥·¢ĞÅºÅ
-//chax_tri  ÏòÏÂ²ãÊä³öµÄÍ¨µÀ´¥·¢ĞÅºÅ
 
-
-//always@(posedge mclk or posedge puc_rst)begin
-//    if(puc_rst == 1'b1)begin
-//        dma0_tri  <= 1'b0;
-//    end
-//    else begin
-//        case(DMA0TSELx)
-//            0000    : dma0_tri <= dma0req;
-//            default : dma0_tri <= 1'b0;
-//        endcase;
-//    end
-//end
-
-//¶ÔdmaxtselĞÅºÅ½øĞĞ´¥·¢ĞÅºÅµÄ¹éÒ»»¯´¦Àí¡£
-//¸ù¾İDMAxTSELxĞÅºÅ°ÑÊäÈëµÄreq»òÕßÆäËûµÄ´¥·¢ĞÅºÅÍ³Ò»Îªdmax_tri
-always@(posedge mclk or posedge puc_rst)begin
+//å¯¹dmaxtselä¿¡å·è¿›è¡Œè§¦å‘ä¿¡å·çš„å½’ä¸€åŒ–å¤„ç†ã€‚
+always@(posedge mclk or posedge puc_rst )begin
     if(puc_rst == 1'b1)begin
         dma0_tri <= 1'b0;
     end
@@ -230,7 +285,7 @@ always@(posedge mclk or posedge puc_rst)begin
 end
 
 
-always@(posedge mclk or posedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst )begin
     if(puc_rst == 1'b1)begin
         dma1_tri  <= 1'b0;
     end
@@ -255,34 +310,9 @@ always@(posedge mclk or posedge puc_rst)begin
     end
 end
 
-always@(posedge mclk or posedge puc_rst)begin
-    if(puc_rst == 1'b1)begin
-        dma3_tri  <= 1'b0;
-    end
-    else begin
-        case(DMA3TSELx)
-            0000    : dma3_tri <= dma3req;
-            default : dma3_tri <= 1'b0;
-        endcase
-    end
-end
-
-
-always@(posedge mclk or posedge puc_rst)begin
-    if(puc_rst == 1'b1)begin
-        dma4_tri  <= 1'b0;
-    end
-    else begin
-        case(DMA3TSELx)
-            0000    : dma4_tri <= dma4req;
-            default : dma4_tri <= 1'b0;
-        endcase
-    end
-end
-
-//×´Ì¬»ú
+//çŠ¶æ€æœº
 //
-always@(posedge mclk or posedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst )begin
     if(puc_rst == 1'b1)begin
         current_state <= IDLE;
     end
@@ -291,60 +321,36 @@ always@(posedge mclk or posedge puc_rst)begin
     end
 end
 
-// //FSM for sim
-// // synthesis translate_off
-// reg                [63:0]                state_ascii;
-// always @ ( * ) begin
-//         case(current_state)
-//             6'b00_0001  :  state_ascii  <= "IDLE" ;  
-//             6'b00_0010  :  state_ascii  <= "CHA0" ; 
-//             6'b00_0100  :  state_ascii  <= "CHA1" ; 
-//             6'b00_1000  :  state_ascii  <= "CHA2" ; 
-//             6'b01_0000  :  state_ascii  <= "CHA3" ; 
-//             6'b10_0000  :  state_ascii  <= "CHA4" ; 
-//             default     :  state_ascii  <= "ERROR";
-//         endcase
-// end
-
-//idle £º ÊÇ·ñÊÇÑ­»·ÓÅÏÈ¼¶£¬Èç¹û²»ÊÇ£¬ÄÇÃ´ÅĞ¶ÏÍ¨µÀ0ÊÇ·ñÓĞ´¥·¢ĞÅºÅ£¬Èç¹ûÓĞ£¬Ôò½øÈë×´Ì¬CHA0
-//µ±Í¨µÀ0ÎŞ´¥·¢ĞÅºÅÊÇ£¬ÔòÅĞ¶ÏÍ¨µÀ1¡£ÀàËÆÖ±µ½Í¨µÀ2.Èç¹ûÍ¨µÀ2ÈÔÈ»Ã»ÓĞ´¥·¢ĞÅºÅ£¬ÔòÁôÔÚ±¾×´Ì¬
-//Èç¹ûÊÇÑ­»·ÓÅÏÈ¼¶£¬ÔòĞèÒª¸ù¾İ±äÁ¿last_txf_chaÅĞ¶ÏÉÏÒ»´Î´«ÊäÍ¨µÀĞòºÅ
-//Èç¹û×Ô´ÓÉÏÒ»´Î¸´Î»ÒÔÀ´Ã»ÓĞ´«Êä£¬ÄÇÃ´ÓÅÏÈ¼¶Îª 0-1-2-3-4
-//µ±Ç°ÓÅÏÈ¼¶     µ±Ç°´«ÊäÍ¨µÀ  ĞÂµÄÓÅÏÈ¼¶
-//0-1-2-3-4       0            1-2-3-4-0
-//1-2-3-4-0       1            2-3-4-0-1
-//2-3-4-0-1       2            3-4-0-1-2
-//3-4-0-1-2       3            4-0-1-2-3
-//4-0-1-2-3       4            0-1-2-3-4
-
-//  last_txf_cha      ËµÃ÷
-//  5'b00_000               ¸´Î»Ö®ºó½øĞĞµÚÒ»´Î´«Êä
-//  5'b00_001               ÉÏÒ»´Î´«ÊäµÄÊÇÍ¨µÀ0
-//  5'b00_010               ÉÏÒ»´Î´«ÊäµÄÊÇÍ¨µÀ1
-//  5'b00_100               ÉÏÒ»´Î´«ÊäµÄÊÇÍ¨µÀ2
-//  5'b01_000               ÉÏÒ»´Î´«ÊäµÄÊÇÍ¨µÀ3
-//  5'b10_000               ÉÏÒ»´Î´«ÊäµÄÊÇÍ¨µÀ4
-
+//idle ï¼š æ˜¯å¦æ˜¯å¾ªç¯ä¼˜å…ˆçº§ï¼Œå¦‚æœä¸æ˜¯ï¼Œé‚£ä¹ˆåˆ¤æ–­é€šé“0æ˜¯å¦æœ‰è§¦å‘ä¿¡å·ï¼Œå¦‚æœæœ‰ï¼Œåˆ™è¿›å…¥çŠ¶æ€CHA0
+//å½“é€šé“0æ— è§¦å‘ä¿¡å·æ˜¯ï¼Œåˆ™åˆ¤æ–­é€šé“1ã€‚ç±»ä¼¼ç›´åˆ°é€šé“2.å¦‚æœé€šé“2ä»ç„¶æ²¡æœ‰è§¦å‘ä¿¡å·ï¼Œåˆ™ç•™åœ¨æœ¬çŠ¶æ€
+//å¦‚æœæ˜¯å¾ªç¯ä¼˜å…ˆçº§ï¼Œåˆ™éœ€è¦æ ¹æ®å˜é‡last_txf_chaåˆ¤æ–­ä¸Šä¸€æ¬¡ä¼ è¾“é€šé“åºå·
+//å¦‚æœè‡ªä»ä¸Šä¸€æ¬¡å¤ä½ä»¥æ¥æ²¡æœ‰ä¼ è¾“ï¼Œé‚£ä¹ˆä¼˜å…ˆçº§ä¸º 0-1-2
+//å¦‚æœä¸Šä¸€æ¬¡é€šé“ä¸º1ï¼Œåˆ™ä¼˜å…ˆçº§ä¸º2-0-1
+//å¦‚æœä¸Šä¸€æ¬¡é€šé“ä¸º2ï¼Œåˆ™ä¼˜å…ˆçº§ä¸º0-1-2
+//å¦‚æœä¸Šä¸€æ¬¡é€šé“ä¸º0ï¼Œåˆ™ä¼˜å…ˆçº§ä¸º1-2-0
 always@(*)begin
     if(puc_rst == 1'b1)begin
         next_state <= IDLE;
     end
     else begin
-        case(current_state)
+ case(current_state)
             IDLE    :    begin
                 if(ROUNDROBIN == 1'b0)begin
-                //¹Ì¶¨ÓÅÏÈ¼¶
-                    next_state = (dma0_tri) ? CHA0 :
-                                 (dma1_tri) ? CHA1 :
-                                 (dma2_tri) ? CHA2 :
-                                 (dma3_tri) ? CHA3 :
-                                 (dma4_tri) ? CHA4 : IDLE;
+                    if(dma0_tri)begin
+                        next_state <= CHA0;
+                    end
+                    else if(dma1_tri)begin
+                        next_state <= CHA1;
+                    end
+                    else if(dma2_tri)begin
+                        next_state <= CHA2;
+                    end
+                    else begin
+                    end
                 end
                 else begin
-                //Ñ­»·ÓÅÏÈ¼¶
                 //2time
-                //¸´Î»ºóÊ×´Î´«Êä£¬ÓÅÏÈ¼¶Îª0-1-2-3-4
-                    if(last_txf_cha == 5'b00_000)begin
+                    if(last_txf_cha == 3'b000)begin
                         if(dma0_tri)begin
                             next_state <= CHA0;
                         end
@@ -354,46 +360,26 @@ always@(*)begin
                         else if(dma2_tri)begin
                             next_state <= CHA2;
                         end
-                        else if (dma3_tri) begin
-                            next_state <= CHA3;
-                        end
-                        else if (dma4_tri) begin
-                            next_state <= CHA4;
-                        end
                         else begin
                         end
                     end
-                //Ö®Ç°´«ÊäÍ¨µÀÎª0£¬µ±Ç°ÓÅÏÈ¼¶Îª1-2-3-4-0
-                    else if(last_txf_cha == 5'b00_001)begin
+                    else if(last_txf_cha == 3'b001)begin
                         if(dma1_tri)begin
                             next_state <= CHA1;
                         end
                         else if(dma2_tri)begin
                             next_state <= CHA2;
                         end
-                        else if(dma3_tri)begin
-                            next_state <= CHA3;
-                        end
-                        else if (dma4_tri) begin
-                            next_state <= CHA4; 
-                        end
-                        else if (dma0_tri) begin
+                        else if(dma0_tri)begin
                             next_state <= CHA0;
                         end
                         else begin
                         end
                     end
-                //Ö®Ç°´«ÊäÍ¨µÀÊÇ1£¬µ±Ç°´«ÊäÓÅÏÈ¼¶Îª2-3-4-0-1
-                    else if(last_txf_cha ==  5'b00_010)begin
+                    else if(last_txf_cha == 3'b010)begin
                         if(dma2_tri)begin
                             next_state <= CHA2;
                         end
-                        else if(dma3_tri)begin
-                            next_state <= CHA3;
-                        end
-                        else if(dma4_tri)begin
-                            next_state <= CHA4;
-                        end
                         else if(dma0_tri)begin
                             next_state <= CHA0;
                         end
@@ -403,48 +389,7 @@ always@(*)begin
                         else begin
                         end
                     end
-                 //Ö®Ç°´«ÊäÍ¨µÀÊÇ2£¬µ±Ç°´«ÊäÓÅÏÈ¼¶Îª3-4-0-1-2          
-                    else if(last_txf_cha == 5'b00_100)begin
-                        if(dma3_tri)begin
-                            next_state <= CHA3;
-                        end
-                        else if(dma4_tri)begin
-                            next_state <= CHA4;
-                        end
-                        else if(dma0_tri)begin
-                            next_state <= CHA0;
-                        end
-                        else if(dma1_tri)begin
-                            next_state <= CHA1;
-                        end
-                        else if(dma2_tri)begin
-                            next_state <= CHA2;
-                        end
-                        else begin
-                        end
-                    end
-                 //Ö®Ç°´«ÊäÍ¨µÀÊÇ3£¬µ±Ç°´«ÊäÓÅÏÈ¼¶Îª4-0-1-2-3
-                    else if(last_txf_cha == 5'b01_000)begin
-                        if(dma4_tri)begin
-                            next_state <= CHA4;
-                        end
-                        else if(dma0_tri)begin
-                            next_state <= CHA0;
-                        end
-                        else if(dma1_tri)begin
-                            next_state <= CHA1;
-                        end
-                        else if(dma2_tri)begin
-                            next_state <= CHA2;
-                        end
-                        else if(dma3_tri)begin
-                            next_state <= CHA3;
-                        end
-                        else begin
-                        end
-                    end
-                 //Ö®Ç°´«ÊäÍ¨µÀÊÇ4£¬µ±Ç°´«ÊäÓÅÏÈ¼¶Îª0-1-2-3-4        
-                    else if(last_txf_cha == 5'b10_000)begin
+                    else if(last_txf_cha == 3'b100)begin
                         if(dma0_tri)begin
                             next_state <= CHA0;
                         end
@@ -454,88 +399,44 @@ always@(*)begin
                         else if(dma2_tri)begin
                             next_state <= CHA2;
                         end
-                        else if(dma3_tri)begin
-                            next_state <= CHA3;
-                        end
-                        else if(dma4_tri)begin
-                            next_state <= CHA4;
-                        end
                         else begin
                         end
                     end
-
                     else begin
                     end
-
-                //Ò»´ÎÊ§°ÜµÄ×°±Æ
-//                    case (last_txf_cha)
-//                    000    : begin
-//                             next_state = (dma0_tri) ? CHA0 :
-//                                          (dma1_tri) ? CHA1 :
-//                                          (dma2_tri) ? CHA2 : IDLE;
-//                    end
-//                    001    : begin
-//                             next_state = (dma1_tri) ? CHA1 :
-//                                          (dma2_tri) ? CHA2 :
-//                                          (dma0_tri) ? CHA0 : IDLE;
-//                    end
-//                    010    : begin
-//                             next_state = (dma2_tri) ? CHA2 :
-//                                          (dma0_tri) ? CHA0 :
-//                                          (dma1_tri) ? CHA1 : IDLE;
-//                    end
-//                    100    : begin
-//                             next_state = (dma0_tri) ? CHA0 :
-//                                          (dma1_tri) ? CHA1 :
-//                                          (dma2_tri) ? CHA2 : IDLE;
-//                    end
-//                    default : next_state = IDLE;
-//                    endcase
                 end
             end
-            CHA0    :    next_state = (cha0_tf_done == 1'b1) ? IDLE : CHA0;
-            CHA1    :    next_state = (cha1_tf_done == 1'b1) ? IDLE : CHA1;
-            CHA2    :    next_state = (cha2_tf_done == 1'b1) ? IDLE : CHA2;
-            CHA3    :    next_state = (cha3_tf_done == 1'b1) ? IDLE : CHA3;
-            CHA4    :    next_state = (cha4_tf_done == 1'b1) ? IDLE : CHA4;
+            CHA0    :    next_state = (cha0_tf_done_sy == 1'b1) ? IDLE : CHA0;
+            CHA1    :    next_state = (cha1_tf_done_sy == 1'b1) ? IDLE : CHA1;
+            CHA2    :    next_state = (cha2_tf_done_sy == 1'b1) ? IDLE : CHA2;
             default :    next_state = IDLE;
         endcase
     end
 end
 
-always@(posedge mclk or posedge puc_rst)begin
+always@(posedge mclk or posedge puc_rst )begin
     if(puc_rst == 1'b1)begin
         last_txf_cha <= 3'b0;
         cha0_tri     <= 1'b0;
         cha1_tri     <= 1'b0;
         cha2_tri     <= 1'b0;
-        cha3_tri     <= 1'b0;
-        cha4_tri     <= 1'b0;
     end
     else begin
         case(current_state)
             IDLE    :    begin
             end
             CHA0    :    begin
-                last_txf_cha <= 5'b00_001;
-                cha0_tri      = (cha0_tf_done == 1'b1 ) ? 1'b0 : dma0_tri;
+                last_txf_cha <= 3'b001;
+                cha0_tri      = (cha0_tf_done_sy == 1'b1 ) ? 1'b0 : dma0_tri;
             end
             CHA1    :begin
-                last_txf_cha <= 5'b00_010;
-                cha1_tri      = (cha1_tf_done == 1'b1 ) ? 1'b0 : dma1_tri;
+                last_txf_cha <= 3'b010;
+                cha1_tri      = (cha1_tf_done_sy == 1'b1 ) ? 1'b0 : dma1_tri;
             end
             CHA2    :begin
-                last_txf_cha <= 5'b00_100;
-                cha2_tri      = (cha2_tf_done == 1'b1 ) ? 1'b0 : dma2_tri;
+                last_txf_cha <= 3'b100;
+                cha2_tri      = (cha2_tf_done_sy == 1'b1 ) ? 1'b0 : dma2_tri;
             end
-            CHA3    :begin
-                last_txf_cha <= 5'b01_000 ;
-                cha3_tri      = (cha3_tf_done == 1'b1 ) ? 1'b0 : dma3_tri;
-            end
-            CHA4    :begin
-                last_txf_cha <= 5'b10_000;
-                cha4_tri      = (cha4_tf_done == 1'b1 ) ? 1'b0 : dma4_tri;
-            end                        
             default : begin
             end
         endcase
@@ -543,21 +444,6 @@ always@(posedge mclk or posedge puc_rst)begin
 end
 
 
-//FSM for sim
-// synthesis translate_off
-reg                [63:0]                state_ascii;
-always @ ( * ) begin
-        case(current_state)
-        IDLE       :        state_ascii        <= "IDLE   ";
-        CHA0       :        state_ascii        <= "CHA0   ";
-        CHA1       :        state_ascii        <= "CHA1   ";
-        CHA2       :        state_ascii        <= "CHA2   ";
-        CHA3       :        state_ascii        <= "CHA3   ";    
-        CHA4       :        state_ascii        <= "CHA4   ";    
-        default    :        state_ascii        <= "default";
-        endcase
-end
-// synthesis translate_on
 
 
 
