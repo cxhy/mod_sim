@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate:  2016-02-20 11:40:59
+// $LastChangedDate:  2016-02-22 14:17:06
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -846,6 +846,12 @@ conv_encode7 u_conv_encode7(
    .encode_out_valid    (encode_out_valid),
    .encode_out_end      (encode_out_end)
    );
+
+//CRC interface
+//
+
+
+
 
 ////////////////////////////////////////////////////
 //
