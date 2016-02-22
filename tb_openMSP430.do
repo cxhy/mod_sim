@@ -4,11 +4,33 @@ vmap work work
 vlog -work work tb_openMSP430.v
 vlog -work work openMSP430.v
 
-
+vlog -work work dma_decode_16b.v
 vcom -work work dma_channel.vhd
 vlog -work work dma_pri.v
-vlog -work work dma_master.v
+vcom -work work dma_master.vhd
+
 vlog -work work dma_tfbuffer.v
+
+vcom -work work fifo.vhd
+vcom -work work fifo_ctl_in.vhd
+vcom -work work fifo_ctl_out.vhd
+
+
+
+vcom -work work viterbi_top.vhd
+vcom -work work acsunit.vhd
+vcom -work work controller_ram.vhd
+vcom -work work ram_32_64.vhd
+vcom -work work ram_trace_top.vhd
+vcom -work work trace.vhd
+vcom -work work compare.vhd
+vcom -work work trace_controller.vhd
+vcom -work work viterbi_butterfly.vhd
+vcom -work work viterbi_dis.vhd
+vcom -work work viterbi_mmu.vhd
+
+vcom -work work conv_encode7.vhd
+
 
 vlog -work work io_cell.v
 vlog -work work msp_debug.v
@@ -43,49 +65,9 @@ vlog -work work template_periph_8b.v
 vlog -work work template_periph_16b.v
 vlog -work work timescale.v
 
-vsim -do {.\tb_openMSP430.do} -novopt work.tb_openMSP430
-
-
-
-#vsim -novopt tb_openMSP430
-#add wave sim:/tb_openMSP430/dma_master_0/dma_channel_u3/*
-#add wave  \
-#sim:/tb_openMSP430/dma_master_0/dma_addr \
-#sim:/tb_openMSP430/dma_master_0/dma_din \
-#sim:/tb_openMSP430/dma_master_0/dma_en \
-#sim:/tb_openMSP430/dma_master_0/dma_we \
-#sim:/tb_openMSP430/dma_master_0/mclk \
-#sim:/tb_openMSP430/dma_master_0/dma_dout \
-#sim:/tb_openMSP430/dma_master_0/dma_ready \
-#sim:/tb_openMSP430/dma_master_0/dma_resp
-#add wave sim:/tb_openMSP430/template_periph_8b_0/*
-#add wave sim:/tb_openMSP430/gpio_0/*
-##添加P3口和P6口的仿真信号
-
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_en
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_sel
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/eu_per_en
-#
-#add wave  \
-#sim:/tb_openMSP430/dut/dma_dout
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/dmem_dout
-#add wave  \
-#sim:/tb_openMSP430/dmem_dout
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/ext_mem_din_sel
-#
-#add wave  \
-#sim:/tb_openMSP430/dut/mem_backbone_0/ext_per_en
-
-add wave -position insertpoint sim:/tb_openMSP430/dma_tfbuffer_u/*
-
+vsim -novopt tb_openMSP430
+add wave sim:/tb_openMSP430/fifo_ctl_1/*
 radix -hex
 view wave
-run 100us
+run -all
 

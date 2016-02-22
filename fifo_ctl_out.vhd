@@ -4,27 +4,27 @@ USE IEEE.STD_LOGIC_ARITH.all;
 USE IEEE.STD_LOGIC_UNSIGNED.all;
 ENTITY fifo_ctl_out IS
    PORT(
-        clk                : IN STD_LOGIC;
-		rst                : IN STD_LOGIC;
-		code_ctrl          : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		code_ctrl_en       : IN STD_LOGIC;
-		viterbi_out_begin  : IN STD_LOGIC;
-		viterbi_out_end    : IN STD_LOGIC;
-		encode_out_begin   : IN STD_LOGIC;
-		encode_out_end     : IN STD_LOGIC;
-		        
-		viterbi_out        : IN STD_LOGIC;
-		viterbi_out_valid  : IN STD_LOGIC;
-		encode_out         : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-		encode_out_valid   : IN STD_LOGIC;
-		trigger0           : IN STD_LOGIC;
-		trigger1           : IN STD_LOGIC;
-		       
-        code_sel_tri       : OUT STD_LOGIC;			   
+        clk                : IN STD_LOGIC                     ;
+		rst                : IN STD_LOGIC                     ;
+		code_ctrl          : IN STD_LOGIC_VECTOR(15 DOWNTO 0) ;
+		code_ctrl_en       : IN STD_LOGIC                     ;
+		viterbi_out_begin  : IN STD_LOGIC                     ;
+		viterbi_out_end    : IN STD_LOGIC                     ;
+		encode_out_begin   : IN STD_LOGIC                     ;
+		encode_out_end     : IN STD_LOGIC                     ;
+
+		viterbi_out        : IN STD_LOGIC                     ;
+		viterbi_out_valid  : IN STD_LOGIC                     ;
+		encode_out         : IN STD_LOGIC_VECTOR(1 DOWNTO 0)  ;
+		encode_out_valid   : IN STD_LOGIC                     ;
+		trigger0           : IN STD_LOGIC                     ;
+		trigger1           : IN STD_LOGIC                     ;
+
+        code_sel_tri       : OUT STD_LOGIC                    ;
 		fifo_1_out         : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		fifo_1_out_valid   : OUT STD_LOGIC
    );
-   
+
 END ENTITY;
 
 ARCHITECTURE arch_fifo_out OF fifo_ctl_out IS
@@ -80,11 +80,11 @@ fifo_1 : fifo GENERIC MAP(
 	          data_out => data_out
 		  );
 
-		  
+
 PROCESS(clk,rst)
 BEGIN
 IF(rst='0')THEN
-   encode_mod<='0'; 
+   encode_mod<='0';
    viterbi_mod<='0';
 ELSIF(clk 'EVENT AND clk='1')THEN
    IF(code_ctrl_en='1')THEN
@@ -95,14 +95,14 @@ ELSIF(clk 'EVENT AND clk='1')THEN
         encode_mod<='1';
 	    viterbi_mod<='0';
      ELSE
-        encode_mod<='0'; 
-	    viterbi_mod<='0'; 
-     END IF;  
+        encode_mod<='0';
+	    viterbi_mod<='0';
+     END IF;
    END IF;
 END IF;
 END PROCESS;
 
-		  
+
 PROCESS(clk,rst)
 VARIABLE fifo_1_in_viterbi : STD_LOGIC_VECTOR(15 DOWNTO 0);
 VARIABLE fifo_1_in_encode  : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -123,17 +123,17 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 	      fifo_1_in_viterbi(j):='0';
 	   END LOOP;
 	   fifo_1_in_viterbi(i):=viterbi_out;
-	   
+
        IF(i<15)THEN
          i<=i+1;
 		 data_in<=(OTHERS=>'0');
 	     wr<='0';
-	   ELSE	   
+	   ELSE
 		 i<=0;
 		 data_in<=fifo_1_in_viterbi;
 		 wr<='1';
-	   END IF;  
-    ELSE 
+	   END IF;
+    ELSE
        wr<='0';
 	   data_in<=(OTHERS=>'0');
     END IF;
@@ -147,8 +147,8 @@ ELSIF(clk 'EVENT AND clk='1')THEN
  	   data_in<=(OTHERS=>'0');
 	END IF;
   END IF;
- 
-  
+
+
  END IF;
  --------------------------------------------
  ---------------encode----------------------
@@ -160,9 +160,9 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 		      fifo_1_in_encode(x-1 DOWNTO x-2):=(OTHERS=>'0');
 			  x:=x-2;
 		 END LOOP;
-		 
+
 		 fifo_1_in_encode(k+1 DOWNTO k):=encode_out;
-		 
+
 	     IF(k<14)THEN
 	        k<=k+2;
 		    wr<='0';
@@ -186,7 +186,7 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 	  END IF;
     END IF;
  END IF;
- 
+
 END IF;
 END PROCESS;
 
@@ -194,7 +194,7 @@ END PROCESS;
 
 --------------------------------------------------------------------------------
 ----------------------------------------------------------------------------
--- rd<=NOT(empty);  
+-- rd<=NOT(empty);
 ---读fifo数据输出到外设区的内存单元，供dma数据搬运
 --------------------------------------------------------
 -----------来自经过优先级选择过后的通道1的触发信号，踩上升沿，
@@ -247,34 +247,34 @@ ELSIF(clk 'EVENT AND clk='1')THEN
       rd_en:='1';
    END IF;
   END IF;
-  
+
   IF(viterbi_mod='1')THEN---viterbi模式时需要来自viterbi数据译码结束时产生读信号
     IF(viterbi_out_end='1')THEN
 	  rd_en:='1';
 	END IF;
   END IF;
-  
+
    IF(rd_en='1')THEN
      count:=count+1;---每8个周期读一次，因为需要将输出写入到外设区的内存单元，按照DMA取数的速度，需要8个周期更新一次新的数据
 	 IF(count=8)THEN
 	   count:=0;
 	 END IF;
-	 
+
      IF(count=2)THEN
        rd<='1';
 	 ELSE
 	   rd<='0';
 	 END IF;
-	 
+
 	 IF(empty='1')THEN--fifo空就不需要再往外读了
 	   rd<='0';
 	   rd_en:='0';--空时，就停止读
 	   count:=0;
 	 END IF;
-	  
+
    END IF;
-  
-   
+
+
 END IF;
 END PROCESS;
 
@@ -316,8 +316,8 @@ code_sel_tri<=trigger1 WHEN encode_mod='1' ELSE
               trigger1_flag WHEN viterbi_mod='1';
 
 ------------------------------------------------
-------------------------------------------------		  
+------------------------------------------------
 
-             
+
 
 END arch_fifo_out;
