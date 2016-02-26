@@ -56,5 +56,5 @@ vsim -novopt tb_openMSP430
 add wave sim:/tb_openMSP430/template_periph_8b_0/*
 radix -hex
 view wave
-run -all
+run 300us
 
