@@ -2,8 +2,6 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
-
-
 ENTITY fifo_ctl_in IS
   PORT(
       clk                  : IN STD_LOGIC;
@@ -12,17 +10,17 @@ ENTITY fifo_ctl_in IS
       per_decode_in_valid  : IN STD_LOGIC;--有效信号，避免同一个数据多次有效，影响了解码的数据
       code_ctrl            : IN STD_LOGIC_VECTOR(15 DOWNTO 0);--viterbi模式或者encode模式，受软件控制
       code_ctrl_en         : IN STD_LOGIC;--当软件有配置的时候会有一个周期的高电平
-	  trigger              : IN STD_LOGIC;--当DMA通道0开始触发的时候，从外设区固定地址下有解码数据输出时，这时候就要启动fifo控制器，向code模块输送数据
+	    trigger              : IN STD_LOGIC;--当DMA通道0开始触发的时候，从外设区固定地址下有解码数据输出时，这时候就要启动fifo控制器，向code模块输送数据
       transfer_long        : IN STD_LOGIC_VECTOR(15 DOWNTO 0);--code的大小，viterbi解码时，帧长度即为transfer_long，encode编码时帧长度为transfer_long+6
-                 
+
       fifo_0_out0_begin    : OUT STD_LOGIC;--vitebri模块开始脉冲
       fifo_0_out0_end      : OUT STD_LOGIC;--viterbi模块结束脉冲
       fifo_0_out0_0        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);--viterbi模块数据
       fifo_0_out0_1        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);--viterbi模块数据
       fifo_0_out0_valid    : OUT STD_LOGIC;--viterbi模块数据有效
-                         
-	  fifo_0_out1_begin    : OUT STD_LOGIC;--encode模块开始脉冲
-	  fifo_0_out1_end      : OUT STD_LOGIC;--encode模块结束脉冲
+
+	    fifo_0_out1_begin    : OUT STD_LOGIC;--encode模块开始脉冲
+	    fifo_0_out1_end      : OUT STD_LOGIC;--encode模块结束脉冲
       fifo_0_out1          : OUT STD_LOGIC;--encode模块数据
       fifo_0_out1_en       : OUT STD_LOGIC--encode模块数据有效
   );
@@ -60,10 +58,6 @@ SIGNAL per_in_valid_pos : STD_LOGIC;
 SIGNAL encode_mod : STD_LOGIC;--encode模式标志位
 SIGNAL viterbi_mod : STD_LOGIC;--viterbi模式标志位
 
-SIGNAL viterbi_long : INTEGER RANGE -1 TO 2048;
--- SIGNAL viterbi_long : INTEGER ;
-SIGNAL encode_long : INTEGER RANGE -1 TO 2048;
--- SIGNAL encode_long : INTEGER;
 SIGNAL flag_viterbi : STD_LOGIC;--当viterbi开始脉冲触发后，viterbi一直有效工作的标志位
 SIGNAL viterbi_valid_begin : STD_LOGIC;--viterbi开始脉冲寄存器
 SIGNAL viterbi_valid_end : STD_LOGIC;--viterbi结束脉冲寄存器
@@ -78,8 +72,6 @@ SIGNAL data_8b : STD_LOGIC_VECTOR(7 DOWNTO 0);
 SIGNAl data_8b_en : STD_LOGIC;
 SIGNAL fifo_out : STD_LOGIC;--encode数据输出
 SIGNAL fifo_out_en : STD_LOGIC;--encode数据输出使能
-
--- SIGNAL data_out_valid_r : STD_LOGIC;
 
 
 BEGIN
@@ -107,10 +99,10 @@ ELSIF(clk 'EVENT AND clk='1')THEN
    per_in_valid_r<=per_decode_in_valid;
 END IF;
 END PROCESS;
-per_in_valid_pos<=per_decode_in_valid AND (NOT per_in_valid_r);	 
+per_in_valid_pos<=per_decode_in_valid AND (NOT per_in_valid_r);
 
 ---------------------------------------------------------------------------
-------------------fifo 8bit 写入数据，先写低8位，后写高8位----------------- 
+------------------fifo 8bit 写入数据，先写低8位，后写高8位-----------------
 PROCESS(clk,rst)
 VARIABLE count : STD_LOGIC:='0';
 BEGIN
@@ -131,11 +123,6 @@ ELSIF(clk 'EVENT AND clk='1')THEN
   ELSE
     wr<='0';
   END IF;
-  
-  IF(viterbi_valid_end='1' OR encode_valid_end='1')THEN
-     count:='0';
-  END IF;
-  
 END IF;
 END PROCESS;
 
@@ -145,7 +132,7 @@ END PROCESS;
 PROCESS(clk,rst)
 BEGIN
 IF(rst='0')THEN
-   encode_mod<='0'; 
+   encode_mod<='0';
    viterbi_mod<='0';
 ELSIF(clk 'EVENT AND clk='1')THEN
    IF(code_ctrl_en='1')THEN
@@ -156,9 +143,9 @@ ELSIF(clk 'EVENT AND clk='1')THEN
         encode_mod<='1';
 	    viterbi_mod<='0';
      ELSE
-        encode_mod<='0'; 
-	    viterbi_mod<='0'; 
-     END IF;  
+        encode_mod<='0';
+	    viterbi_mod<='0';
+     END IF;
    END IF;
 END IF;
 END PROCESS;
@@ -179,32 +166,30 @@ END IF;
 END PROCESS;
 trigger_pos<=trigger AND (NOT trigger_r);
 
-
-
 -------------------------------------------------------------------------------------------------------------
 --------输出给viterbi输入的接口处理，由输入开始脉冲和帧信号长度，控制viterbi的开始脉冲、数据信号(4bit)和结束脉冲---
 PROCESS(clk,rst)
--- VARIABLE viterbi_long : INTEGER RANGE 0 TO 2049;
+VARIABLE viterbi_long : INTEGER RANGE 0 TO 2048;
 BEGIN
 IF(rst='0')THEN
   flag_viterbi<='0';
   viterbi_valid_begin<='0';
   viterbi_valid_end<='0';
-  viterbi_long<=0;
+  viterbi_long:=0;
 ELSIF(clk 'EVENT AND clk='1')THEN
   IF(viterbi_mod='1')THEN
     IF(trigger_pos='1')THEN
        flag_viterbi<='1';
 	   viterbi_valid_begin<='1';
  	   viterbi_valid_end<='0';
-	   viterbi_long<=conv_integer(transfer_long)-1;
-	ELSE 
+	   viterbi_long:=conv_integer(transfer_long);
+	ELSE
 	   viterbi_valid_begin<='0';
     END IF;
-    
+
     IF(flag_viterbi='1' AND viterbi_valid_end='0')THEN
       IF(data_out_valid='1')THEN
- 	   viterbi_long<=viterbi_long-1;
+ 	   viterbi_long:=viterbi_long-1;
         IF(viterbi_long=0)THEN
  		 viterbi_valid_end<='1';
  		 flag_viterbi<='0';
@@ -216,7 +201,7 @@ ELSIF(clk 'EVENT AND clk='1')THEN
   ELSE
      flag_viterbi<='0';
      viterbi_valid_end<='0';
-     viterbi_long<=0;
+     viterbi_long:=0;
   END IF;
 END IF;
 END PROCESS;
@@ -243,7 +228,6 @@ IF(rst='0')THEN
   fifo_0_out0_0<=(OTHERS=>'0');
   fifo_0_out0_1<=(OTHERS=>'0');
   fifo_0_out0_valid<='0';
-  
 ELSIF(clk 'EVENT AND clk='1')THEN
   IF(viterbi_mod='1')THEN
     IF(flag_viterbi='1' AND viterbi_valid_end='0')THEN
@@ -258,7 +242,6 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 	  fifo_0_out0_0<=(OTHERS=>'0');
       fifo_0_out0_1<=(OTHERS=>'0');
       fifo_0_out0_valid<='0';
-	  
 	END IF;
   END IF;
 END IF;
@@ -269,7 +252,7 @@ END PROCESS;
 -------------------------------------------------------------------------------------------------------------------------------------
 -------输出给encode模块输入的接口处理，由输入开始脉冲和帧信号长度，控制encode的开始脉冲、数据信号(1bit)和结束脉冲--------------------
 PROCESS(clk,rst)
--- VARIABLE encode_long : INTEGER RANGE 0 TO 2049;
+VARIABLE encode_long : INTEGER RANGE 0 TO 2048;
 VARIABLE flag : STD_LOGIC;
 BEGIN
 IF(rst='0')THEN
@@ -281,9 +264,8 @@ IF(rst='0')THEN
   data_8b_en<='0';
   fifo_out<='0';
   fifo_out_en<='0';
-  encode_long<=40;
+  encode_long:=40;
   flag:='0';
-  -- data_out_valid_r<='0';
 ELSIF(clk 'EVENT AND clk='1')THEN
   IF(encode_mod='1')THEN
      IF(trigger_pos='1')THEN
@@ -295,32 +277,26 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 		data_8b_en<='0';
 		fifo_out<='0';
 		fifo_out_en<='0';
-		encode_long<=conv_integer(transfer_long)-1;
+		encode_long:=conv_integer(transfer_long);
 		flag:='0';
 	 ELSE
 	    encode_valid_begin<='0';
 	 END IF;
-	 
-	 -- data_out_valid_r<=data_out_valid;
+
 	 IF(flag_encode='1' AND encode_valid_end='0')THEN
 	   flag:='1';
        IF(data_out_valid='1')THEN
          data_8b<=data_out;
 	     data_8b_en<='1';
 	   END IF;
-	   
-	   IF(encode_long=0)THEN
-	      encode_valid_end<='1';
-		  flag_encode<='0';
-	   END IF;
-	   
 	   IF(data_8b_en='1')THEN
 	     fifo_out<=data_8b(i);
 		 i<=i+1;
 	     fifo_out_en<='1';
-		 encode_long<=encode_long-1;
+		 encode_long:=encode_long-1;
 		 IF(encode_long=0)THEN
-		    encode_long<=40;
+		    encode_valid_end<='1';
+			flag_encode<='0';
 			data_8b_en<='0';
 			i<=0;
 		 ELSE
@@ -336,13 +312,8 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 	    encode_valid_end<='0';
 	    fifo_out_en<='0';
 	    fifo_out<='0';
+
 	 END IF;
-  ELSE
-     encode_long<=0;
-	 flag_encode<='0';
-	 encode_valid_end<='0';
-	 data_8b_en<='0';
-	 flag:='0';
   END IF;
 END IF;
 END PROCESS;
@@ -361,7 +332,7 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 	 fifo_0_out1_begin<=encode_valid_begin;
 	 fifo_0_out1_end<=encode_valid_end_r;
      fifo_0_out1<=fifo_out;
-	 fifo_0_out1_en<=fifo_out_en;	 
+	 fifo_0_out1_en<=fifo_out_en;
   ELSE
     fifo_0_out1_begin<='0';
     fifo_0_out1_end<='0';
@@ -372,7 +343,5 @@ ELSIF(clk 'EVENT AND clk='1')THEN
 END IF;
 END PROCESS;
 
--------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------
 
 END arch_fifo_in;

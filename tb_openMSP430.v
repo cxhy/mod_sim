@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 // $Rev: 205 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2015-07-15 22:59:52 +0200 (Wed, 15 Jul 2015) $
+// $LastChangedDate:  2016-02-20 11:40:59
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -142,8 +142,26 @@ wire           decoder_buffer_dout_en;
 wire    [15:0]  code_ctrl;
 wire           code_ctrl_en;
 wire    [15:0] viterbi_long;
-
 wire    [15:0] per_dout_d2v;
+
+wire           viterbi_in_start;
+wire           viterbi_in_end;
+wire    [3:0]  viterbi_in_0;
+wire    [3:0]  viterbi_in_1;
+wire           viterbi_in_valid;
+wire           viterbi_out_begin;
+wire           viterbi_out;
+wire           viterbi_out_valid;
+wire           viterbi_out_end;
+
+wire           encode_start;
+wire           encode_end;
+wire           encode_in;
+wire           encode_in_en;
+wire           encode_out_begin;
+wire           encode_out_end;
+wire    [1:0]  encode_out;
+wire           encode_out_valid;
 
 
 // Peripheral templates
@@ -320,9 +338,9 @@ initial
 initial
   begin
      // tmp_seed                = `SEED;
-     // tmp_seed                = $urandom(tmp_seed);
-     // error                   = 0;
-     // stimulus_done           = 1;
+     tmp_seed                = $urandom(tmp_seed);
+     error                   = 0;
+     stimulus_done           = 1;
      irq                     = {`IRQ_NR-2{1'b0}};
      nmi                     = 1'b0;
      // wkup                    = 14'h0000;
@@ -715,24 +733,24 @@ dma_master u_dma_master(
 		.dma_ready  (dma_ready),
 		.dma_resp   (dma_resp),
 		.dma_dout   (dma_dout),
-		
+
 		.per_addr   (per_addr),             // Peripheral address
         .per_din    (per_din),              // Peripheral data input
 		.per_en     (per_en),               // Peripheral enable (high active)///
 		.per_we     (per_we),               // Peripheral write enable (high active)
 		.code_sel_tri (code_sel_tri),
-		
+
 		.per_dout   (per_dout_dma),    // Peripheral data output
 		.trigger0   (trigger0),
 		.trigger1   (trigger1),
 		.trigger2   (trigger2),
-		
+
 		.dma_wkup   (dma_wkup),
 		.dma_addr   (dma_addr),
 		.dma_din    (dma_din),
 		.dma_en     (dma_en),
 		.dma_we     (dma_we),
-		.dma_priority (dma_priority)		
+		.dma_priority (dma_priority)
 );
 
 dma_tfbuffer dma_tfbuffer_u(
@@ -752,23 +770,83 @@ dma_tfbuffer dma_tfbuffer_u(
     .per_dout               (per_dout_d2v)
     );
 
-	
-viterbi_conv_top viterbi_conv_top_0(
-     .clk                        (mclk),
-	 .rst                        (~puc_rst),
-	 .trigger0                   (trigger0),
-	 .trigger1                   (trigger1),
-	 .code_ctrl                  (code_ctrl),
-	 .code_ctrl_en               (code_ctrl_en),
-	 .viterbi_long               (viterbi_long),
-	                       
-	 .decoder_buffer_dout        (decoder_buffer_dout),
-	 .decoder_buffer_dout_en     (decoder_buffer_dout_en),
-	                         
-	 .encoder_buffer_din         (encoder_buffer_din),
-	 .encoder_buffer_din_en      (encoder_buffer_din_en),
-	 .code_sel_tri               (code_sel_tri)
-     );
+
+
+
+fifo_ctl_in fifo_ctl_0(                     //////code输入控制型fifo
+   .clk                   (mclk),
+   .rst                   (~puc_rst),
+   .per_decode_in         (decoder_buffer_dout),
+   .per_decode_in_valid   (decoder_buffer_dout_en),
+   .code_ctrl             (code_ctrl),
+   .code_ctrl_en          (code_ctrl_en),
+   .trigger               (trigger0),
+   .transfer_long         (viterbi_long),
+
+   .fifo_0_out0_begin     (viterbi_in_start),
+   .fifo_0_out0_end       (viterbi_in_end),
+   .fifo_0_out0_0         (viterbi_in_0),
+   .fifo_0_out0_1         (viterbi_in_1),
+   .fifo_0_out0_valid     (viterbi_in_valid),
+
+   .fifo_0_out1_begin     (encode_start),
+   .fifo_0_out1_end       (encode_end),
+   .fifo_0_out1           (encode_in),
+   .fifo_0_out1_en        (encode_in_en)
+   );
+
+
+fifo_ctl_out fifo_ctl_1(                  //////code输出控制型fifo
+   .clk                   (mclk),
+   .rst                   (~puc_rst),
+   .code_ctrl             (code_ctrl),
+   .code_ctrl_en          (code_ctrl_en),
+   .viterbi_out_begin     (viterbi_out_begin),
+   .viterbi_out_end       (viterbi_out_end),
+   .encode_out_begin      (encode_out_begin),
+   .encode_out_end        (encode_out_end),
+
+   .viterbi_out           (viterbi_out),
+   .viterbi_out_valid     (viterbi_out_valid),
+   .encode_out            (encode_out),
+   .encode_out_valid      (encode_out_valid),
+   .trigger0              (trigger0),
+   .trigger1              (trigger1),
+
+   .code_sel_tri          (code_sel_tri),
+   .fifo_1_out            (encoder_buffer_din),
+   .fifo_1_out_valid      (encoder_buffer_din_en)
+   );
+
+
+viterbi_top u_viterbi(
+   .clk                 (mclk),
+   .rst                 (~puc_rst),
+   .viterbi_in_start    (viterbi_in_start),
+   .viterbi_in_end      (viterbi_in_end),
+   .viterbi_in_0        (viterbi_in_0),
+   .viterbi_in_1        (viterbi_in_1),
+   .viterbi_in_valid    (viterbi_in_valid),
+
+   .viterbi_out_begin   (viterbi_out_begin),
+   .viterbi_out         (viterbi_out),
+   .viterbi_out_valid   (viterbi_out_valid),
+   .viterbi_out_end     (viterbi_out_end)
+   );
+
+conv_encode7 u_conv_encode7(
+   .clk                 (mclk),
+   .rst                 (~puc_rst),
+   .encode_start        (encode_start),
+   .encode_end          (encode_end),
+   .encode_in           (encode_in),
+   .encode_in_en        (encode_in_en),
+   .encode_out_begin    (encode_out_begin),
+   .encode_out          (encode_out),
+   .encode_out_valid    (encode_out_valid),
+   .encode_out_end      (encode_out_end)
+   );
+
 ////////////////////////////////////////////////////
 //
 // Generate Waveform

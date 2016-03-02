@@ -3,17 +3,17 @@ USE IEEE.STD_LOGIC_1164.ALL;
 
 ENTITY viterbi_top IS
 PORT(
-clk:IN STD_LOGIC; ---系统的时钟信号
-rst:IN STD_LOGIC; ---系统的复位信号
-viterbi_in_start : IN STD_LOGIC;
-viterbi_in_end : IN STD_LOGIC;
-viterbi_in_0:IN STD_LOGIC_VECTOR(3 DOWNTO 0);---系统的数据输入端口1
-viterbi_in_1:IN STD_LOGIC_VECTOR(3 DOWNTO 0);---系统的数据输入端口2
-viterbi_in_valid:IN STD_LOGIC;---数据的有效信号
-viterbi_out_begin:OUT STD_LOGIC;
-viterbi_out: OUT STD_LOGIC;---viterbi的译码结果
-viterbi_out_valid:OUT STD_LOGIC;---输出信号的有效信号
-viterbi_out_end:OUT STD_LOGIC
+clk               : IN  STD_LOGIC; ---系统的时钟信号
+rst               : IN  STD_LOGIC; ---系统的复位信号
+viterbi_in_start  : IN  STD_LOGIC;
+viterbi_in_end    : IN  STD_LOGIC;
+viterbi_in_0      : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);---系统的数据输入端口1
+viterbi_in_1      : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);---系统的数据输入端口2
+viterbi_in_valid  : IN  STD_LOGIC;---数据的有效信号
+viterbi_out_begin : OUT STD_LOGIC;
+viterbi_out       : OUT STD_LOGIC;---viterbi的译码结果
+viterbi_out_valid : OUT STD_LOGIC;---输出信号的有效信号
+viterbi_out_end   : OUT STD_LOGIC
 );
 END ENTITY;
 

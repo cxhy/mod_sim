@@ -30,7 +30,7 @@ vcom -work work viterbi_dis.vhd
 vcom -work work viterbi_mmu.vhd
 
 vcom -work work conv_encode7.vhd
-vcom -work work viterbi_conv_top.vhd
+
 
 vlog -work work io_cell.v
 vlog -work work msp_debug.v
@@ -66,8 +66,7 @@ vlog -work work template_periph_16b.v
 vlog -work work timescale.v
 
 vsim -novopt tb_openMSP430
-#add wave sim:/tb_openMSP430/fifo_ctl_1/*
-add wave *
+add wave sim:/tb_openMSP430/fifo_ctl_1/*
 radix -hex
 view wave
 run -all
