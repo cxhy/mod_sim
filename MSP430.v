@@ -1,39 +1,4 @@
- //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
-//
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
-//
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-//
-//----------------------------------------------------------------------------
-//
-// *File Name: tb_openMSP430.v
-//
-// *Module Description:
-//                      openMSP430 testbench
-//
-// *Author(s):
-//              - Olivier Girard,    olgirard@gmail.com
-//
-//----------------------------------------------------------------------------
-// $Rev: 205 $
-// $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2015-07-15 22:59:52 +0200 (Wed, 15 Jul 2015) $
+
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -41,7 +6,33 @@
 `include "openMSP430_defines.v"
 `endif
 
-module  tb_openMSP430;
+module  MSP430(
+    
+); 
+ input  cpu_en        
+ input  dbg_en       
+ input  I2C_ADDR       
+ input  I2C_BROADCAST  
+ input  dbg_scl_slave  
+ input  dbg_sda_slave_in
+ input  dbg_uart_rxd  
+ input  dco_clk    
+ input  dmem_dout   
+ input  irq_in    
+ input  lfxt_clk       
+ input  dma_addr        
+ input  dma_din         
+ input  dma_en          
+ input  dma_priority   
+ input  dma_we      
+ input  dma_wkup       
+ input  nmi             
+ input  per_dout        
+ input  pmem_dout      
+ input  reset_n       
+ input  scan_enable     
+ input  scan_mode      
+ input  wkup_in    
 
 //
 // Wire & Register definition
@@ -104,12 +95,7 @@ wire         [7:0] p5_sel;
 wire         [7:0] p6_dout;
 wire         [7:0] p6_dout_en;
 wire         [7:0] p6_sel;
-reg          [7:0] p1_din;
-reg          [7:0] p2_din;
-reg          [7:0] p3_din;
-reg          [7:0] p4_din;
-reg          [7:0] p5_din;
-reg          [7:0] p6_din;
+
 
 ///dma reg
 wire         [15:0]dma_ctl0;
@@ -127,8 +113,6 @@ wire         [15:0]dma2_sa;
 wire         [15:0]dma2_da;
 wire         [15:0]dma2_sz;
 
-///
-// wire               trigger;
 wire               trigger0;
 wire               trigger1;
 wire               trigger2;
@@ -155,14 +139,7 @@ wire        [15:0] per_dout_dma;
 wire               irq_ta0;
 wire               irq_ta1;
 wire        [15:0] per_dout_timerA;
-reg                inclk;
-reg                taclk;
-reg                ta_cci0a;
-reg                ta_cci0b;
-reg                ta_cci1a;
-reg                ta_cci1b;
-reg                ta_cci2a;
-reg                ta_cci2b;
+
 wire               ta_out0;
 wire               ta_out0_en;
 wire               ta_out1;
@@ -171,11 +148,11 @@ wire               ta_out2;
 wire               ta_out2_en;
 
 // Clock / Reset & Interrupts
-reg                dco_clk;
-wire               dco_enable;
+// reg                dco_clk;
+// wire               dco_enable;
 wire               dco_wkup;
 reg                dco_local_enable;
-reg                lfxt_clk;
+// reg                lfxt_clk;
 wire               lfxt_enable;
 wire               lfxt_wkup;
 reg                lfxt_local_enable;
@@ -195,8 +172,8 @@ reg         [13:0] wkup;
 wire        [13:0] wkup_in;
 
 // Scan (ASIC version only)
-reg                scan_enable;
-reg                scan_mode;
+// reg                scan_enable;
+// reg                scan_mode;
 
 // Debug interface: UART
 reg                dbg_en;
@@ -247,130 +224,8 @@ integer            error;
 reg                stimulus_done;
 
 
-//
-// Include files
-//------------------------------
-
-// CPU & Memory registers
-// `include "registers.v"
-
-// Debug interface tasks
-// `include "dbg_uart_tasks.v"
-// `include "dbg_i2c_tasks.v"
-
-// Direct Memory Access interface tasks
-// `include "dma_tasks.v"
-
-// Verilog stimulus
-// `include "stimulus.v"
 
 
-//
-// Initialize Memory
-//------------------------------
-initial
-  begin
-     // Initialize data memory
-     for (tb_idx=0; tb_idx < `DMEM_SIZE/2; tb_idx=tb_idx+1)
-       dmem_0.mem[tb_idx] = 16'h0000;
-
-     // Initialize program memory
-     #10 $readmemh("./pmem.mem", pmem_0.mem);
-  end
-
-
-//
-// Generate Clock & Reset
-//------------------------------
-initial
-  begin
-     dco_clk          = 1'b0;
-     dco_local_enable = 1'b0;
-     forever
-       begin
-          #25;   // 20 MHz
-          dco_local_enable = (dco_enable===1) ? dco_enable : (dco_wkup===1);
-          if (dco_local_enable | scan_mode)
-            dco_clk = ~dco_clk;
-       end
-  end
-
-initial
-  begin
-     lfxt_clk          = 1'b0;
-     lfxt_local_enable = 1'b0;
-     forever
-       begin
-          #763;  // 655 kHz
-          lfxt_local_enable = (lfxt_enable===1) ? lfxt_enable : (lfxt_wkup===1);
-          if (lfxt_local_enable)
-            lfxt_clk = ~lfxt_clk;
-       end
-  end
-
-initial
-  begin
-     reset_n       = 1'b1;
-     #93;
-     reset_n       = 1'b0;
-     #593;
-     reset_n       = 1'b1;
-  end
-
-initial
-  begin
-     // tmp_seed                = `SEED;
-     // tmp_seed                = $urandom(tmp_seed);
-     // error                   = 0;
-     // stimulus_done           = 1;
-     irq                     = {`IRQ_NR-2{1'b0}};
-     nmi                     = 1'b0;
-     // wkup                    = 14'h0000;
-     // dma_addr                = 15'h0000;
-     // dma_din                 = 16'h0000;
-     // dma_en                  = 1'b0;
-     // dma_priority            = 1'b0;
-     // dma_we                  = 2'b00;
-     // dma_wkup                = 1'b0;
-     // dma_tfx_cancel          = 1'b0;
-     cpu_en                  = 1'b1;
-     dbg_en                  = 1'b0;
-     dbg_uart_rxd_sel        = 1'b0;
-     dbg_uart_rxd_dly        = 1'b1;
-     dbg_uart_rxd_pre        = 1'b1;
-     dbg_uart_rxd_meta       = 1'b0;
-     dbg_uart_buf            = 16'h0000;
-     dbg_uart_rx_busy        = 1'b0;
-     dbg_uart_tx_busy        = 1'b0;
-     dbg_scl_master_sel      = 1'b0;
-     dbg_scl_master_dly      = 1'b1;
-     dbg_scl_master_pre      = 1'b1;
-     dbg_scl_master_meta     = 1'b0;
-     dbg_sda_master_out_sel  = 1'b0;
-     dbg_sda_master_out_dly  = 1'b1;
-     dbg_sda_master_out_pre  = 1'b1;
-     dbg_sda_master_out_meta = 1'b0;
-     dbg_i2c_string          = "";
-     p1_din                  = 8'h00;
-     p2_din                  = 8'h00;
-     p3_din                  = 8'h00;
-     p4_din                  = 8'h00;
-     p5_din                  = 8'h00;
-     p6_din                  = 8'h00;
-     inclk                   = 1'b0;
-     taclk                   = 1'b0;
-     ta_cci0a                = 1'b0;
-     ta_cci0b                = 1'b0;
-     ta_cci1a                = 1'b0;
-     ta_cci1b                = 1'b0;
-     ta_cci2a                = 1'b0;
-     ta_cci2b                = 1'b0;
-     scan_enable             = 1'b0;
-     scan_mode               = 1'b0;
-  end
-
-
-//
 // Program Memory
 //----------------------------------
 
