@@ -715,24 +715,24 @@ dma_master u_dma_master(
 		.dma_ready  (dma_ready),
 		.dma_resp   (dma_resp),
 		.dma_dout   (dma_dout),
-		
+
 		.per_addr   (per_addr),             // Peripheral address
         .per_din    (per_din),              // Peripheral data input
 		.per_en     (per_en),               // Peripheral enable (high active)///
 		.per_we     (per_we),               // Peripheral write enable (high active)
 		.code_sel_tri (code_sel_tri),
-		
+
 		.per_dout   (per_dout_dma),    // Peripheral data output
 		.trigger0   (trigger0),
 		.trigger1   (trigger1),
 		.trigger2   (trigger2),
-		
+
 		.dma_wkup   (dma_wkup),
 		.dma_addr   (dma_addr),
 		.dma_din    (dma_din),
 		.dma_en     (dma_en),
 		.dma_we     (dma_we),
-		.dma_priority (dma_priority)		
+		.dma_priority (dma_priority)
 );
 
 dma_tfbuffer dma_tfbuffer_u(
@@ -752,7 +752,7 @@ dma_tfbuffer dma_tfbuffer_u(
     .per_dout               (per_dout_d2v)
     );
 
-	
+
 viterbi_conv_top viterbi_conv_top_0(
      .clk                        (mclk),
 	 .rst                        (~puc_rst),
@@ -761,10 +761,10 @@ viterbi_conv_top viterbi_conv_top_0(
 	 .code_ctrl                  (code_ctrl),
 	 .code_ctrl_en               (code_ctrl_en),
 	 .viterbi_long               (viterbi_long),
-	                       
+
 	 .decoder_buffer_dout        (decoder_buffer_dout),
 	 .decoder_buffer_dout_en     (decoder_buffer_dout_en),
-	                         
+
 	 .encoder_buffer_din         (encoder_buffer_din),
 	 .encoder_buffer_din_en      (encoder_buffer_din_en),
 	 .code_sel_tri               (code_sel_tri)
