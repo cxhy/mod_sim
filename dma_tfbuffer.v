@@ -29,7 +29,7 @@
 // $Rev:  $
 // $CreatDate:   2015-11-19 15:21:53
 // $LastChangedBy: guodezheng $
-// $LastChangedDate:  2016-02-18 15:52:58
+// $LastChangedDate:  2016-01-04 16:18:13
 //----------------------------------------------------------------------------
 //
 // *File Name: dma_tfbuffer.v
@@ -103,10 +103,10 @@ wire           reg_sel          = per_en & (per_addr [13:DEC_WD-1] == BASE_ADDR[
 wire      [DEC_WD-1:0] reg_addr = {per_addr[DEC_WD-2:0], 1'b0};
 
 
-wire      [DEC_SZ-1:0] reg_dec  = (ENCODER_BUFFERIN_D         & {DEC_SZ{(reg_addr == ENCODER_BUFFERIN)}}) |       //00           >>1 == 00
+wire      [DEC_SZ-1:0] reg_dec  = (ENCODER_BUFFERIN_D         & {DEC_SZ{(reg_addr == ENCODER_BUFFERIN)}})|       //00           >>1 == 00
                                   (DECODER_BUFFEROUT_D        & {DEC_SZ{(reg_addr == DECODER_BUFFEROUT)}})|       //02           >>1 == 01
                                   (CODE_CTRLOUT_D             & {DEC_SZ{(reg_addr == CODE_CTRLOUT)}})     |
-				                          (VITERBI_LONG_D             & {DEC_SZ{(reg_addr == VITERBI_LONG)}});       //04           >>1 == 10
+				                  (VITERBI_LONG_D             & {DEC_SZ{(reg_addr == VITERBI_LONG)}});       //04           >>1 == 10
 
 
 wire              reg_write =  per_we  & reg_sel;
